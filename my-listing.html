@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Dashboard | HomeServiceDirectory</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared.css">
+</head>
+<body>
+
+  <section class="directory-hero" style="padding:100px 0 40px;text-align:center;">
+    <div class="container">
+      <h1>Provider <span style="color:var(--red);">Dashboard</span></h1>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:20px;">
+    <div class="container" style="max-width:900px;">
+
+      <!-- Login Section -->
+      <div id="loginSection">
+        <div style="background:var(--white);border-radius:var(--radius-lg);padding:40px;max-width:420px;margin:0 auto;border:1px solid var(--light-gray);">
+          <h2 style="font-size:1.3rem;margin-bottom:20px;text-align:center;">Sign In to Your Dashboard</h2>
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" class="form-input" placeholder="you@company.com">
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" class="form-input" placeholder="Your password">
+          </div>
+          <button onclick="login()" id="loginBtn" class="btn btn-primary" style="width:100%;justify-content:center;">Sign In</button>
+          <div id="loginError" class="alert alert-error" style="display:none;margin-top:12px;"></div>
+          <p style="text-align:center;margin-top:16px;font-size:0.85rem;color:var(--mid-gray);">Don't have a listing? <a href="/list-your-business">List your business free</a></p>
+        </div>
+      </div>
+
+      <!-- Dashboard Section -->
+      <div id="dashboardSection" style="display:none;">
+
+        <!-- Stats Bar -->
+        <div class="grid-4" style="margin-bottom:32px;">
+          <div style="background:var(--white);border-radius:var(--radius-lg);padding:20px;text-align:center;border:1px solid var(--light-gray);">
+            <span style="font-size:2rem;font-weight:800;color:var(--red);display:block;" id="statViews">0</span>
+            <span style="font-size:0.82rem;color:var(--dark-gray);">Profile Views</span>
+          </div>
+          <div style="background:var(--white);border-radius:var(--radius-lg);padding:20px;text-align:center;border:1px solid var(--light-gray);">
+            <span style="font-size:2rem;font-weight:800;color:var(--green);display:block;" id="statLeads">0</span>
+            <span style="font-size:0.82rem;color:var(--dark-gray);">Leads Received</span>
+          </div>
+          <div style="background:var(--white);border-radius:var(--radius-lg);padding:20px;text-align:center;border:1px solid var(--light-gray);">
+            <span style="font-size:2rem;font-weight:800;color:var(--sky);display:block;" id="statReviews">0</span>
+            <span style="font-size:0.82rem;color:var(--dark-gray);">Reviews</span>
+          </div>
+          <div style="background:var(--white);border-radius:var(--radius-lg);padding:20px;text-align:center;border:1px solid var(--light-gray);">
+            <span style="font-size:2rem;font-weight:800;display:block;" id="statPlan">FREE</span>
+            <span style="font-size:0.82rem;color:var(--dark-gray);">Current Plan</span>
+          </div>
+        </div>
+
+        <!-- Plan Upgrade -->
+        <div id="upgradeBar" style="background:linear-gradient(135deg,var(--navy),#1a1a2e);color:var(--white);border-radius:var(--radius-lg);padding:24px;margin-bottom:32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+          <div>
+            <h3 style="font-size:1.1rem;margin-bottom:4px;">Upgrade to receive exclusive leads</h3>
+            <p style="font-size:0.88rem;color:var(--ice);">Free listings are visible but leads are only sent to paid members.</p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button onclick="checkout('pro')" class="btn btn-sm" style="background:var(--orange);color:white;">Pro $149/mo</button>
+            <button onclick="checkout('premium')" class="btn btn-sm" style="background:var(--red);color:white;">Premium $299/mo</button>
+            <button onclick="checkout('elite')" class="btn btn-sm" style="background:var(--gold);color:var(--navy);">Elite $499/mo</button>
+          </div>
+        </div>
+
+        <!-- Leads Table -->
+        <div style="background:var(--white);border-radius:var(--radius-lg);padding:24px;margin-bottom:32px;border:1px solid var(--light-gray);">
+          <h2 style="font-size:1.2rem;margin-bottom:16px;">Recent Leads</h2>
+          <div id="leadsTable" style="overflow-x:auto;">
+            <p style="color:var(--mid-gray);font-size:0.88rem;">No leads yet.</p>
+          </div>
+        </div>
+
+        <!-- Listing Info -->
+        <div style="background:var(--white);border-radius:var(--radius-lg);padding:24px;border:1px solid var(--light-gray);">
+          <h2 style="font-size:1.2rem;margin-bottom:16px;">Your Listing</h2>
+          <div id="listingInfo"></div>
+          <div style="margin-top:16px;">
+            <a id="viewListingLink" href="#" class="btn btn-secondary btn-sm" target="_blank">View Live Listing</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="/shared-layout.js"></script>
+  <script>
+    let currentSlug = '';
+    let currentToken = '';
+
+    // Check URL params for auto-login
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('token') && params.get('slug')) {
+      currentSlug = params.get('slug');
+      currentToken = params.get('token');
+      loadDashboard();
+    }
+
+    async function login() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      if (!email || !password) {
+        document.getElementById('loginError').textContent = 'Email and password required.';
+        document.getElementById('loginError').style.display = 'block';
+        return;
+      }
+
+      document.getElementById('loginBtn').disabled = true;
+      document.getElementById('loginBtn').textContent = 'Signing in...';
+
+      try {
+        const res = await fetch('/api/provider-lookup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.slug) {
+          currentSlug = data.slug;
+          currentToken = data.accessToken;
+          loadDashboard();
+        } else {
+          document.getElementById('loginError').textContent = data.error || 'Login failed.';
+          document.getElementById('loginError').style.display = 'block';
+        }
+      } catch (e) {
+        document.getElementById('loginError').textContent = 'Network error.';
+        document.getElementById('loginError').style.display = 'block';
+      }
+
+      document.getElementById('loginBtn').disabled = false;
+      document.getElementById('loginBtn').textContent = 'Sign In';
+    }
+
+    async function loadDashboard() {
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('dashboardSection').style.display = 'block';
+
+      try {
+        const res = await fetch('/api/provider-dashboard?slug=' + currentSlug + '&token=' + currentToken);
+        const data = await res.json();
+
+        if (!res.ok) {
+          document.getElementById('loginSection').style.display = 'block';
+          document.getElementById('dashboardSection').style.display = 'none';
+          return;
+        }
+
+        const l = data.listing;
+        document.getElementById('statViews').textContent = l.viewCount || 0;
+        document.getElementById('statLeads').textContent = data.leadsCount || 0;
+        document.getElementById('statReviews').textContent = l.reviewCount || 0;
+        document.getElementById('statPlan').textContent = (l.plan || 'free').toUpperCase();
+        document.getElementById('statPlan').style.color = l.plan === 'free' ? 'var(--mid-gray)' : 'var(--green)';
+
+        // Hide upgrade bar for paid
+        if (l.plan !== 'free') {
+          document.getElementById('upgradeBar').style.display = 'none';
+        }
+
+        // Listing info
+        document.getElementById('listingInfo').innerHTML = `
+          <p><strong>${l.name}</strong></p>
+          <p style="color:var(--dark-gray);">${l.city}, ${l.state} ${l.zip || ''}</p>
+          <p style="color:var(--dark-gray);font-size:0.88rem;">Categories: ${(l.categories || []).join(', ')}</p>`;
+        document.getElementById('viewListingLink').href = '/listing/' + l.slug;
+
+        // Leads
+        if (data.leads && data.leads.length) {
+          let html = '<table style="width:100%;border-collapse:collapse;font-size:0.88rem;">';
+          html += '<tr style="border-bottom:2px solid var(--light-gray);"><th style="text-align:left;padding:8px;">Name</th><th style="text-align:left;padding:8px;">Service</th><th style="text-align:left;padding:8px;">Status</th><th style="text-align:left;padding:8px;">Date</th></tr>';
+          data.leads.forEach(function(lead) {
+            const statusColor = lead.status === 'converted' ? 'var(--green)' : lead.status === 'contacted' ? 'var(--sky)' : 'var(--dark-gray)';
+            html += '<tr style="border-bottom:1px solid var(--light-gray);">';
+            html += '<td style="padding:8px;">' + lead.name + '<br><span style="font-size:0.8rem;color:var(--mid-gray);">' + (lead.email || '') + '</span></td>';
+            html += '<td style="padding:8px;">' + (lead.serviceType || '-').replace(/-/g, ' ') + '</td>';
+            html += '<td style="padding:8px;color:' + statusColor + ';font-weight:600;">' + (lead.status || 'new').toUpperCase() + '</td>';
+            html += '<td style="padding:8px;">' + new Date(lead.createdAt).toLocaleDateString() + '</td>';
+            html += '</tr>';
+          });
+          html += '</table>';
+          document.getElementById('leadsTable').innerHTML = html;
+        }
+      } catch (e) {
+        console.error('Dashboard error:', e);
+      }
+    }
+
+    async function checkout(plan) {
+      try {
+        const res = await fetch('/api/listing-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan, slug: currentSlug })
+        });
+        const data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else if (data.contactUrl) {
+          window.location.href = data.contactUrl;
+        } else {
+          alert(data.message || data.error || 'Could not create checkout.');
+        }
+      } catch (e) {
+        alert('Network error. Please try again.');
+      }
+    }
+
+    document.getElementById('loginPassword').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') login();
+    });
+  </script>
+</body>
+</html>

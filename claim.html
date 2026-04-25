@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claim Your Listing | HomeServiceDirectory</title>
+  <meta name="description" content="Claim your existing business listing on HomeServiceDirectory to manage your profile, respond to leads, and upgrade your plan.">
+  <link rel="canonical" href="https://homeservicedirectory.com/claim">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared.css">
+</head>
+<body>
+  <section class="directory-hero" style="padding:120px 0 60px;text-align:center;">
+    <div class="container">
+      <h1>Claim Your <span style="color:var(--red);">Listing</span></h1>
+      <p>Already see your business on HomeServiceDirectory? Claim it to take control.</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:20px;">
+    <div class="container" style="max-width:500px;">
+      <div style="background:var(--white);border-radius:var(--radius-lg);padding:40px;border:1px solid var(--light-gray);">
+        <p style="color:var(--dark-gray);margin-bottom:24px;">Enter your business email address. If a listing exists under that email, we'll send you a link to access your dashboard.</p>
+        <div class="form-group">
+          <label for="claimEmail">Business Email</label>
+          <input type="email" id="claimEmail" class="form-input" placeholder="you@company.com">
+        </div>
+        <button onclick="claimListing()" id="claimBtn" class="btn btn-primary" style="width:100%;justify-content:center;">Find My Listing</button>
+        <div id="claimResult" style="margin-top:16px;display:none;"></div>
+      </div>
+      <p style="text-align:center;margin-top:24px;font-size:0.88rem;color:var(--dark-gray);">Don't have a listing yet? <a href="/list-your-business">List your business for free</a>.</p>
+    </div>
+  </section>
+
+  <script src="/shared-layout.js"></script>
+  <script>
+    async function claimListing() {
+      var email = document.getElementById('claimEmail').value.trim();
+      if (!email) return;
+      var btn = document.getElementById('claimBtn');
+      btn.disabled = true;
+      btn.textContent = 'Searching...';
+      try {
+        var res = await fetch('/api/provider-lookup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        var data = await res.json();
+        var el = document.getElementById('claimResult');
+        el.style.display = 'block';
+        if (data.listings && data.listings.length) {
+          el.className = 'alert alert-success';
+          el.innerHTML = '<strong>Found ' + data.listings.length + ' listing(s):</strong><br>' +
+            data.listings.map(function(l) { return '<a href="/my-listing">' + l.name + ' - ' + l.city + ', ' + l.state + '</a>'; }).join('<br>') +
+            '<br><br>Sign in at <a href="/my-listing">My Dashboard</a> with your email and password.';
+        } else {
+          el.className = 'alert alert-info';
+          el.textContent = 'No listing found for this email. You can list your business for free.';
+        }
+      } catch (e) {
+        var el = document.getElementById('claimResult');
+        el.style.display = 'block';
+        el.className = 'alert alert-error';
+        el.textContent = 'Network error. Please try again.';
+      }
+      btn.disabled = false;
+      btn.textContent = 'Find My Listing';
+    }
+  </script>
+</body>
+</html>

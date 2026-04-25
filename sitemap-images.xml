@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://homeservicedirectory.com/plumbing</loc>
+    <lastmod>2026-04-25</lastmod>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://homeservicedirectory.com/images/categories/plumbing.jpg</image:loc>
+      <image:title>Licensed Plumbers — HomeServiceDirectory</image:title>
+      <image:caption>Find licensed and insured licensed plumbers professionals across America. Compare providers, read reviews, and get quotes.</image:caption>
+      <image:geo_location>United States</image:geo_location>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://homeservicedirectory.com/water-damage</loc>
+    <lastmod>2026-04-25</lastmod>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://homeservicedirectory.com/images/categories/water-damage.jpg</image:loc>
+      <image:title>Water Damage Restoration — HomeServiceDirectory</image:title>
+      <image:caption>Find licensed and insured water damage restoration professionals across America. Compare providers, read reviews, and get quotes.</image:caption>
+      <image:geo_location>United States</image:geo_location>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://homeservicedirectory.com/mold-remediation</loc>
+    <lastmod>2026-04-25</lastmod>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://homeservicedirectory.com/images/categories/mold-remediation.jpg</image:loc>
+      <image:title>Mold Remediation — HomeServiceDirectory</image:title>
+      <image:caption>Find licensed and insured mold remediation professionals across America. Compare providers, read reviews, and get quotes.</image:caption>
+      <image:geo_location>United States</image:geo_location>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://homeservicedirectory.com/hvac</loc>
+    <lastmod>2026-04-25</lastmod>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://homeservicedirectory.com/images/categories/hvac.jpg</image:loc>
+      <image:title>HVAC & Air Conditioning — HomeServiceDirectory</image:title>
+      <image:caption>Find licensed and insured hvac & air conditioning professionals across America. Compare providers, read reviews, and get quotes.</image:caption>
+      <image:geo_location>United States</image:geo_location>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://homeservicedirectory.com/electrical</loc>
+    <lastmod>2026-04-25</lastmod>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://homeservicedirectory.com/images/categories/electrical.jpg</image:loc>
+      <image:title>Electrical Services — HomeServiceDirectory</image:title>
+      <image:caption>Find licensed and insured electrical services professionals across America. Compare providers, read reviews, and get quotes.</image:caption>
+      <image:geo_location>United States</image:geo_location>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://homeservicedirectory.com/roofing</loc>
+    <lastmod>2026-04-25</lastmod>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://homeservicedirectory.com/images/categories/roofing.jpg</image:loc>
+      <image:title>Roofing Contractors — HomeServiceDirectory</image:title>
+      <image:caption>Find licensed and insured roofing contractors professionals across America. Compare providers, read reviews, and get quotes.</image:caption>
+      <image:geo_location>United States</image:geo_location>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://homeservicedirectory.com/foundation-repair</loc>
+    <lastmod>2026-04-25</lastmod>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://homeservicedirectory.com/images/categories/foundation-repair.jpg</image:loc>
+      <image:title>Foundation Repair — HomeServiceDirectory</image:title>
+      <image:caption>Find licensed and insured foundation repair professionals across America. Compare providers, read reviews, and get quotes.</image:caption>
+      <image:geo_location>United States</image:geo_location>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://homeservicedirectory.com/fire-damage</loc>
+    <lastmod>2026-04-25</lastmod>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://homeservicedirectory.com/images/categories/fire-damage.jpg</image:loc>
+      <image:title>Fire & Smoke Damage Restoration — HomeServiceDirectory</image:title>
+      <image:caption>Find licensed and insured fire & smoke damage restoration professionals across America. Compare providers, read reviews, and get quotes.</image:caption>
+      <image:geo_location>United States</image:geo_location>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://homeservicedirectory.com/sewage-cleanup</loc>
+    <lastmod>2026-04-25</lastmod>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://homeservicedirectory.com/images/categories/sewage-cleanup.jpg</image:loc>
+      <image:title>Sewage & Biohazard Cleanup — HomeServiceDirectory</image:title>
+      <image:caption>Find licensed and insured sewage & biohazard cleanup professionals across America. Compare providers, read reviews, and get quotes.</image:caption>
+      <image:geo_location>United States</image:geo_location>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://homeservicedirectory.com/storm-damage</loc>
+    <lastmod>2026-04-25</lastmod>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://homeservicedirectory.com/images/categories/storm-damage.jpg</image:loc>
+      <image:title>Storm & Wind Damage Restoration — HomeServiceDirectory</image:title>
+      <image:caption>Find licensed and insured storm & wind damage restoration professionals across America. Compare providers, read reviews, and get quotes.</image:caption>
+      <image:geo_location>United States</image:geo_location>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://homeservicedirectory.com/asbestos-abatement</loc>
+    <lastmod>2026-04-25</lastmod>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://homeservicedirectory.com/images/categories/asbestos-abatement.jpg</image:loc>
+      <image:title>Asbestos & Lead Abatement — HomeServiceDirectory</image:title>
+      <image:caption>Find licensed and insured asbestos & lead abatement professionals across America. Compare providers, read reviews, and get quotes.</image:caption>
+      <image:geo_location>United States</image:geo_location>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://homeservicedirectory.com/locksmith</loc>
+    <lastmod>2026-04-25</lastmod>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://homeservicedirectory.com/images/categories/locksmith.jpg</image:loc>
+      <image:title>Emergency Locksmith — HomeServiceDirectory</image:title>
+      <image:caption>Find licensed and insured emergency locksmith professionals across America. Compare providers, read reviews, and get quotes.</image:caption>
+      <image:geo_location>United States</image:geo_location>
+    </image:image>
+  </url>
+</urlset>

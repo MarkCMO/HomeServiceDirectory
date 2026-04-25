@@ -1,0 +1,545 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "nft"
+  included_files = ["data/**", "netlify/functions/_*.js"]
+
+# Drip email processor - runs every hour
+[functions.drip-processor]
+  schedule = "0 * * * *"
+
+# Commission vesting checker - runs daily at 6am UTC
+[functions.commission-vester]
+  schedule = "0 6 * * *"
+
+# Daily queue builder for all reps - runs daily at 5pm UTC (12pm EST)
+[functions.queue-builder]
+  schedule = "0 17 * * *"
+
+# --- Headers ---
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(self)"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com"
+
+# --- Redirects ---
+
+# API routes
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# ===== Category pages (12) =====
+[[redirects]]
+  from = "/plumbing"
+  to = "/directory/plumbing.html"
+  status = 200
+
+[[redirects]]
+  from = "/water-damage"
+  to = "/directory/water-damage.html"
+  status = 200
+
+[[redirects]]
+  from = "/mold-remediation"
+  to = "/directory/mold-remediation.html"
+  status = 200
+
+[[redirects]]
+  from = "/hvac"
+  to = "/directory/hvac.html"
+  status = 200
+
+[[redirects]]
+  from = "/electrical"
+  to = "/directory/electrical.html"
+  status = 200
+
+[[redirects]]
+  from = "/roofing"
+  to = "/directory/roofing.html"
+  status = 200
+
+[[redirects]]
+  from = "/foundation-repair"
+  to = "/directory/foundation-repair.html"
+  status = 200
+
+[[redirects]]
+  from = "/fire-damage"
+  to = "/directory/fire-damage.html"
+  status = 200
+
+[[redirects]]
+  from = "/sewage-cleanup"
+  to = "/directory/sewage-cleanup.html"
+  status = 200
+
+[[redirects]]
+  from = "/storm-damage"
+  to = "/directory/storm-damage.html"
+  status = 200
+
+[[redirects]]
+  from = "/asbestos-abatement"
+  to = "/directory/asbestos-abatement.html"
+  status = 200
+
+[[redirects]]
+  from = "/locksmith"
+  to = "/directory/locksmith.html"
+  status = 200
+
+# ===== City pages (12 categories) =====
+[[redirects]]
+  from = "/plumbing/:state/:city"
+  to = "/.netlify/functions/city-page"
+  status = 200
+
+[[redirects]]
+  from = "/water-damage/:state/:city"
+  to = "/.netlify/functions/city-page"
+  status = 200
+
+[[redirects]]
+  from = "/mold-remediation/:state/:city"
+  to = "/.netlify/functions/city-page"
+  status = 200
+
+[[redirects]]
+  from = "/hvac/:state/:city"
+  to = "/.netlify/functions/city-page"
+  status = 200
+
+[[redirects]]
+  from = "/electrical/:state/:city"
+  to = "/.netlify/functions/city-page"
+  status = 200
+
+[[redirects]]
+  from = "/roofing/:state/:city"
+  to = "/.netlify/functions/city-page"
+  status = 200
+
+[[redirects]]
+  from = "/foundation-repair/:state/:city"
+  to = "/.netlify/functions/city-page"
+  status = 200
+
+[[redirects]]
+  from = "/fire-damage/:state/:city"
+  to = "/.netlify/functions/city-page"
+  status = 200
+
+[[redirects]]
+  from = "/sewage-cleanup/:state/:city"
+  to = "/.netlify/functions/city-page"
+  status = 200
+
+[[redirects]]
+  from = "/storm-damage/:state/:city"
+  to = "/.netlify/functions/city-page"
+  status = 200
+
+[[redirects]]
+  from = "/asbestos-abatement/:state/:city"
+  to = "/.netlify/functions/city-page"
+  status = 200
+
+[[redirects]]
+  from = "/locksmith/:state/:city"
+  to = "/.netlify/functions/city-page"
+  status = 200
+
+# ===== State pages (12 categories) =====
+[[redirects]]
+  from = "/plumbing/:state"
+  to = "/.netlify/functions/state-page"
+  status = 200
+
+[[redirects]]
+  from = "/water-damage/:state"
+  to = "/.netlify/functions/state-page"
+  status = 200
+
+[[redirects]]
+  from = "/mold-remediation/:state"
+  to = "/.netlify/functions/state-page"
+  status = 200
+
+[[redirects]]
+  from = "/hvac/:state"
+  to = "/.netlify/functions/state-page"
+  status = 200
+
+[[redirects]]
+  from = "/electrical/:state"
+  to = "/.netlify/functions/state-page"
+  status = 200
+
+[[redirects]]
+  from = "/roofing/:state"
+  to = "/.netlify/functions/state-page"
+  status = 200
+
+[[redirects]]
+  from = "/foundation-repair/:state"
+  to = "/.netlify/functions/state-page"
+  status = 200
+
+[[redirects]]
+  from = "/fire-damage/:state"
+  to = "/.netlify/functions/state-page"
+  status = 200
+
+[[redirects]]
+  from = "/sewage-cleanup/:state"
+  to = "/.netlify/functions/state-page"
+  status = 200
+
+[[redirects]]
+  from = "/storm-damage/:state"
+  to = "/.netlify/functions/state-page"
+  status = 200
+
+[[redirects]]
+  from = "/asbestos-abatement/:state"
+  to = "/.netlify/functions/state-page"
+  status = 200
+
+[[redirects]]
+  from = "/locksmith/:state"
+  to = "/.netlify/functions/state-page"
+  status = 200
+
+# ===== Listing detail =====
+[[redirects]]
+  from = "/listing/:slug"
+  to = "/listing.html"
+  status = 200
+
+# ===== Static pages =====
+[[redirects]]
+  from = "/about"
+  to = "/about.html"
+  status = 200
+
+[[redirects]]
+  from = "/contact"
+  to = "/contact.html"
+  status = 200
+
+[[redirects]]
+  from = "/search"
+  to = "/search.html"
+  status = 200
+
+[[redirects]]
+  from = "/list-your-business"
+  to = "/list-your-business.html"
+  status = 200
+
+[[redirects]]
+  from = "/browse-states"
+  to = "/browse-states.html"
+  status = 200
+
+[[redirects]]
+  from = "/privacy"
+  to = "/privacy.html"
+  status = 200
+
+[[redirects]]
+  from = "/terms"
+  to = "/terms.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
+  status = 200
+
+[[redirects]]
+  from = "/pricing"
+  to = "/pricing.html"
+  status = 200
+
+[[redirects]]
+  from = "/my-listing"
+  to = "/my-listing.html"
+  status = 200
+
+[[redirects]]
+  from = "/claim"
+  to = "/claim.html"
+  status = 200
+
+[[redirects]]
+  from = "/upgrade"
+  to = "/upgrade.html"
+  status = 200
+
+[[redirects]]
+  from = "/listing-upgrade-success"
+  to = "/listing-upgrade-success.html"
+  status = 200
+
+# Guide pages
+[[redirects]]
+  from = "/guides/insurance-claims"
+  to = "/guides/insurance-claims.html"
+  status = 200
+
+[[redirects]]
+  from = "/guides/emergency-checklist"
+  to = "/guides/emergency-checklist.html"
+  status = 200
+
+[[redirects]]
+  from = "/guides/hiring-contractors"
+  to = "/guides/hiring-contractors.html"
+  status = 200
+
+# ===== WETYR Platform - Rep / Manager / Admin portals =====
+[[redirects]]
+  from = "/rep-portal"
+  to = "/rep-portal.html"
+  status = 200
+
+[[redirects]]
+  from = "/manager-portal"
+  to = "/manager-portal.html"
+  status = 200
+
+# ===== WETYR Auth API routes =====
+[[redirects]]
+  from = "/api/auth-login"
+  to = "/.netlify/functions/auth-login"
+  status = 200
+
+[[redirects]]
+  from = "/api/auth-logout"
+  to = "/.netlify/functions/auth-logout"
+  status = 200
+
+[[redirects]]
+  from = "/api/auth-session"
+  to = "/.netlify/functions/auth-session"
+  status = 200
+
+# ===== Rep API routes =====
+[[redirects]]
+  from = "/api/rep-onboard"
+  to = "/.netlify/functions/rep-onboard"
+  status = 200
+
+[[redirects]]
+  from = "/api/rep-dashboard"
+  to = "/.netlify/functions/rep-dashboard"
+  status = 200
+
+[[redirects]]
+  from = "/api/rep-poc-submit"
+  to = "/.netlify/functions/rep-poc-submit"
+  status = 200
+
+[[redirects]]
+  from = "/api/rep-poc-list"
+  to = "/.netlify/functions/rep-poc-list"
+  status = 200
+
+[[redirects]]
+  from = "/api/rep-poc-update"
+  to = "/.netlify/functions/rep-poc-update"
+  status = 200
+
+[[redirects]]
+  from = "/api/rep-call-log"
+  to = "/.netlify/functions/rep-call-log"
+  status = 200
+
+[[redirects]]
+  from = "/api/rep-daily-queue"
+  to = "/.netlify/functions/rep-daily-queue"
+  status = 200
+
+[[redirects]]
+  from = "/api/rep-legal-sign"
+  to = "/.netlify/functions/rep-legal-sign"
+  status = 200
+
+[[redirects]]
+  from = "/api/rep-commissions"
+  to = "/.netlify/functions/rep-commissions"
+  status = 200
+
+# ===== Manager API routes =====
+[[redirects]]
+  from = "/api/manager-dashboard"
+  to = "/.netlify/functions/manager-dashboard"
+  status = 200
+
+[[redirects]]
+  from = "/api/manager-rep-update"
+  to = "/.netlify/functions/manager-rep-update"
+  status = 200
+
+# ===== Admin API routes =====
+[[redirects]]
+  from = "/api/admin-reps"
+  to = "/.netlify/functions/admin-reps"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin-managers"
+  to = "/.netlify/functions/admin-managers"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin-commissions"
+  to = "/.netlify/functions/admin-commissions"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin-platform"
+  to = "/.netlify/functions/admin-platform"
+  status = 200
+
+# ===== Email API routes =====
+[[redirects]]
+  from = "/api/email-send"
+  to = "/.netlify/functions/email-send"
+  status = 200
+
+[[redirects]]
+  from = "/api/email-unsubscribe"
+  to = "/.netlify/functions/email-unsubscribe"
+  status = 200
+
+[[redirects]]
+  from = "/api/drip-trigger"
+  to = "/.netlify/functions/drip-trigger"
+  status = 200
+
+# ===== PDF =====
+[[redirects]]
+  from = "/api/pdf-packet"
+  to = "/.netlify/functions/pdf-packet"
+  status = 200
+
+# ===== Square webhook =====
+[[redirects]]
+  from = "/api/square-webhook"
+  to = "/.netlify/functions/square-webhook"
+  status = 200
+
+# ===== FAQ & additional static pages =====
+[[redirects]]
+  from = "/faq"
+  to = "/faq.html"
+  status = 200
+
+# ===== Admin routes =====
+[[redirects]]
+  from = "/api/admin-listings"
+  to = "/.netlify/functions/admin-listings"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin-leads"
+  to = "/.netlify/functions/admin-leads"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin-setup"
+  to = "/.netlify/functions/admin-setup"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin-stats"
+  to = "/.netlify/functions/admin-stats"
+  status = 200
+
+# ===== Migration & tools =====
+[[redirects]]
+  from = "/api/blob-to-supabase"
+  to = "/.netlify/functions/blob-to-supabase"
+  status = 200
+
+[[redirects]]
+  from = "/api/scraper-import"
+  to = "/.netlify/functions/scraper-import"
+  status = 200
+
+[[redirects]]
+  from = "/api/queue-builder"
+  to = "/.netlify/functions/queue-builder"
+  status = 200
+
+[[redirects]]
+  from = "/api/health-check"
+  to = "/.netlify/functions/health-check"
+  status = 200
+
+# ===== Netlify Scheduled Functions (cron) =====
+# Drip processing - handled via cron in netlify.toml below
+
+# ===== Content-Type headers for AI/LLM files =====
+[[headers]]
+  for = "/llm.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=86400"
+    X-Robots-Tag = "all"
+
+[[headers]]
+  for = "/ai.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=86400"
+    X-Robots-Tag = "all"
+
+[[headers]]
+  for = "/humans.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/.well-known/llm.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=86400"
+
+# ===== Sitemap content-type headers =====
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Content-Type = "application/xml; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/sitemap-*.xml"
+  [headers.values]
+    Content-Type = "application/xml; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/llm-sitemap.xml"
+  [headers.values]
+    Content-Type = "application/xml; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
+
+# ===== robots.txt =====
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=3600"

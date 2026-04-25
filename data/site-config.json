@@ -1,0 +1,133 @@
+{
+  "brand": {
+    "name": "HomeServiceDirectory",
+    "legalName": "HomeServiceDirectory",
+    "tagline": "America's Emergency Home Service Directory",
+    "description": "Find trusted, licensed home service professionals for plumbing, HVAC, water damage, mold remediation, roofing, electrical, and every home emergency. Verified providers. Exclusive leads. 50-state coverage.",
+    "url": "https://homeservicedirectory.com",
+    "logo": "/images/logo.png",
+    "foundingDate": "2026",
+    "founder": {
+      "name": "Mark Gabrielli",
+      "jobTitle": "Founder",
+      "url": "https://markcmo.com"
+    },
+    "contact": {
+      "email": "hello@homeservicedirectory.com",
+      "phone": ""
+    },
+    "social": {
+      "twitter": "",
+      "facebook": "",
+      "instagram": "",
+      "linkedin": ""
+    }
+  },
+  "seo": {
+    "titleSuffix": " | HomeServiceDirectory",
+    "defaultOgImage": "/images/og-default.png",
+    "gaId": "",
+    "indexNowKey": ""
+  },
+  "categories": {
+    "plumbing": {
+      "title": "Plumbing",
+      "shortTitle": "Plumbing",
+      "emoji": "🔧",
+      "metaDesc": "emergency plumbers, drain cleaning, pipe repair, water heater, and leak detection services",
+      "subcategories": ["Emergency Plumber", "Drain Cleaning", "Pipe Repair", "Sewer Line", "Water Heater", "Repiping", "Leak Detection", "Gas Line"]
+    },
+    "water-damage": {
+      "title": "Water Damage Restoration",
+      "shortTitle": "Water Damage",
+      "emoji": "💧",
+      "metaDesc": "emergency water removal, flood cleanup, basement flooding, and water damage restoration services",
+      "subcategories": ["Water Removal", "Flood Cleanup", "Basement Flooding", "Content Restoration", "Structural Drying", "Moisture Detection"]
+    },
+    "mold-remediation": {
+      "title": "Mold Remediation",
+      "shortTitle": "Mold",
+      "emoji": "🦠",
+      "metaDesc": "mold inspection, mold removal, mold testing, black mold, and crawl space mold remediation",
+      "subcategories": ["Mold Inspection", "Mold Removal", "Mold Testing", "Black Mold", "Crawl Space Mold", "Attic Mold", "Air Quality Testing"]
+    },
+    "hvac": {
+      "title": "HVAC & Air Conditioning",
+      "shortTitle": "HVAC",
+      "emoji": "❄️",
+      "metaDesc": "AC repair, heating repair, duct cleaning, HVAC installation, and indoor air quality services",
+      "subcategories": ["AC Repair", "Heating Repair", "Duct Cleaning", "AC Installation", "Furnace Install", "Mini-Split", "Air Quality", "Duct Sealing"]
+    },
+    "electrical": {
+      "title": "Electrical Services",
+      "shortTitle": "Electrical",
+      "emoji": "⚡",
+      "metaDesc": "emergency electricians, panel upgrades, wiring repair, outlet installation, and generator services",
+      "subcategories": ["Emergency Electrician", "Panel Upgrade", "Wiring Repair", "Outlet Install", "Generator Install", "EV Charger", "Lighting", "Surge Protection"]
+    },
+    "roofing": {
+      "title": "Roofing & Roof Repair",
+      "shortTitle": "Roofing",
+      "emoji": "🏠",
+      "metaDesc": "emergency roof repair, roof replacement, leak repair, storm damage roofing, and gutter services",
+      "subcategories": ["Emergency Roof Repair", "Roof Replacement", "Leak Repair", "Storm Damage", "Gutter Install", "Roof Inspection", "Shingle Repair", "Flat Roof"]
+    },
+    "foundation-repair": {
+      "title": "Foundation Repair",
+      "shortTitle": "Foundation",
+      "emoji": "🏗️",
+      "metaDesc": "foundation repair, basement waterproofing, crawl space encapsulation, concrete leveling, and structural engineering",
+      "subcategories": ["Foundation Repair", "Basement Waterproofing", "Crawl Space Encapsulation", "Concrete Leveling", "Structural Engineering", "Pier Installation"]
+    },
+    "fire-damage": {
+      "title": "Fire & Smoke Damage",
+      "shortTitle": "Fire Damage",
+      "emoji": "🔥",
+      "metaDesc": "fire damage restoration, smoke damage cleanup, soot removal, and emergency board-up services",
+      "subcategories": ["Fire Restoration", "Smoke Damage", "Soot Removal", "Board-Up", "Content Cleaning", "Odor Removal"]
+    },
+    "sewage-cleanup": {
+      "title": "Sewage & Biohazard Cleanup",
+      "shortTitle": "Sewage",
+      "emoji": "☣️",
+      "metaDesc": "sewage cleanup, biohazard remediation, septic overflow, and contamination services",
+      "subcategories": ["Sewage Cleanup", "Biohazard Remediation", "Septic Overflow", "Contamination Cleanup", "Hoarding Cleanup", "Crime Scene Cleanup"]
+    },
+    "storm-damage": {
+      "title": "Storm & Wind Damage",
+      "shortTitle": "Storm",
+      "emoji": "🌪️",
+      "metaDesc": "storm damage repair, wind damage, hail damage, hurricane cleanup, and emergency tarping services",
+      "subcategories": ["Storm Cleanup", "Wind Damage", "Hail Damage", "Hurricane Cleanup", "Emergency Tarping", "Tree Removal", "Debris Removal"]
+    },
+    "asbestos-abatement": {
+      "title": "Asbestos & Lead Abatement",
+      "shortTitle": "Asbestos",
+      "emoji": "⚠️",
+      "metaDesc": "asbestos removal, lead paint abatement, radon mitigation, environmental testing, and hazardous material services",
+      "subcategories": ["Asbestos Removal", "Lead Paint Abatement", "Radon Mitigation", "Environmental Testing", "Hazmat Services", "Air Monitoring"]
+    },
+    "locksmith": {
+      "title": "Emergency Locksmith",
+      "shortTitle": "Locksmith",
+      "emoji": "🔑",
+      "metaDesc": "emergency locksmith, lockout service, lock repair, rekeying, and security system installation",
+      "subcategories": ["Emergency Lockout", "Lock Repair", "Rekeying", "Lock Installation", "Security Systems", "Safe Services", "Car Lockout", "Commercial Locks"]
+    }
+  },
+  "serviceTypes": [
+    { "slug": "emergency-24-7", "label": "24/7 Emergency", "icon": "🚨" },
+    { "slug": "residential", "label": "Residential", "icon": "🏠" },
+    { "slug": "commercial", "label": "Commercial", "icon": "🏢" },
+    { "slug": "industrial", "label": "Industrial", "icon": "🏭" },
+    { "slug": "insurance-work", "label": "Insurance Work", "icon": "📋" },
+    { "slug": "free-estimates", "label": "Free Estimates", "icon": "✅" }
+  ],
+  "plans": {
+    "free": { "name": "Free", "price": 0, "photos": 0 },
+    "pro": { "name": "Pro", "price": 14900, "priceDisplay": "$149/mo", "photos": 5 },
+    "premium": { "name": "Premium", "price": 29900, "priceDisplay": "$299/mo", "photos": 15 },
+    "elite": { "name": "Elite", "price": 49900, "priceDisplay": "$499/mo", "photos": 50 },
+    "sponsor": { "name": "City Sponsor", "price": 79900, "priceDisplay": "$799/mo", "photos": 50 }
+  }
+}

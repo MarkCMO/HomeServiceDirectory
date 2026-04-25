@@ -1,0 +1,27 @@
+/* TEAM */
+  Founder & CEO: Mark Gabrielli
+  Site: https://markcmo.com
+  Twitter: @MarkGabrieli
+  From: United States
+
+  Platform: HomeServiceDirectory
+  Operated By: WETYR Corporation
+  Email: hello@homeservicedirectory.com
+
+/* TECHNOLOGY */
+  Platform: Netlify
+  Backend: Netlify Functions (Node.js)
+  Database: Supabase (PostgreSQL)
+  CDN: Netlify Edge
+  Email: Resend
+  Payments: Square
+
+/* THANKS */
+  Built to help homeowners find licensed, trusted professionals
+  for every home emergency — fast.
+
+/* SITE */
+  Last update: 2026/04/25
+  Language: English
+  Doctype: HTML5
+  IDE: Claude Code

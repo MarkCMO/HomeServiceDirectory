@@ -1,0 +1,8 @@
+node_modules/
+.netlify/plugins/node_modules/
+.netlify/
+scripts/scraper-output/
+.env
+.env.local
+*.log
+npm-debug.log*

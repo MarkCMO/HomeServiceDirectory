@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browse by State - All 50 States | HomeServiceDirectory</title>
+  <meta name="description" content="Find home service professionals by state. Browse plumbing, HVAC, water damage, mold, roofing, electrical, and more across all 50 US states.">
+  <link rel="canonical" href="https://homeservicedirectory.com/browse-states">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared.css">
+</head>
+<body>
+  <section class="directory-hero" style="padding:120px 0 60px;text-align:center;">
+    <div class="container">
+      <h1>Browse by <span style="color:var(--red);">State</span></h1>
+      <p>Find home service professionals in your state</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:20px;">
+    <div class="container">
+
+      <div style="margin-bottom:32px;">
+        <label for="categorySelect" style="font-weight:600;font-size:0.92rem;margin-right:12px;">Select a service:</label>
+        <select id="categorySelect" class="form-select" style="width:auto;display:inline-block;" onchange="updateLinks()">
+          <option value="plumbing">Plumbing</option>
+          <option value="water-damage">Water Damage</option>
+          <option value="mold-remediation">Mold Remediation</option>
+          <option value="hvac">HVAC</option>
+          <option value="electrical">Electrical</option>
+          <option value="roofing">Roofing</option>
+          <option value="foundation-repair">Foundation Repair</option>
+          <option value="fire-damage">Fire & Smoke</option>
+          <option value="sewage-cleanup">Sewage Cleanup</option>
+          <option value="storm-damage">Storm Damage</option>
+          <option value="asbestos-abatement">Asbestos Abatement</option>
+          <option value="locksmith">Locksmith</option>
+        </select>
+      </div>
+
+      <div class="state-grid" id="stateGrid"></div>
+
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="container">
+      <h2>Don't See Your Business?</h2>
+      <p>List your home service business for free and reach homeowners nationwide.</p>
+      <a href="/list-your-business" class="btn btn-primary btn-lg">List Your Business Free</a>
+    </div>
+  </section>
+
+  <script src="/shared-layout.js"></script>
+  <script>
+    var states = [
+      {name:'Alabama',slug:'alabama'},{name:'Alaska',slug:'alaska'},{name:'Arizona',slug:'arizona'},{name:'Arkansas',slug:'arkansas'},
+      {name:'California',slug:'california'},{name:'Colorado',slug:'colorado'},{name:'Connecticut',slug:'connecticut'},{name:'Delaware',slug:'delaware'},
+      {name:'Florida',slug:'florida'},{name:'Georgia',slug:'georgia'},{name:'Hawaii',slug:'hawaii'},{name:'Idaho',slug:'idaho'},
+      {name:'Illinois',slug:'illinois'},{name:'Indiana',slug:'indiana'},{name:'Iowa',slug:'iowa'},{name:'Kansas',slug:'kansas'},
+      {name:'Kentucky',slug:'kentucky'},{name:'Louisiana',slug:'louisiana'},{name:'Maine',slug:'maine'},{name:'Maryland',slug:'maryland'},
+      {name:'Massachusetts',slug:'massachusetts'},{name:'Michigan',slug:'michigan'},{name:'Minnesota',slug:'minnesota'},{name:'Mississippi',slug:'mississippi'},
+      {name:'Missouri',slug:'missouri'},{name:'Montana',slug:'montana'},{name:'Nebraska',slug:'nebraska'},{name:'Nevada',slug:'nevada'},
+      {name:'New Hampshire',slug:'new-hampshire'},{name:'New Jersey',slug:'new-jersey'},{name:'New Mexico',slug:'new-mexico'},{name:'New York',slug:'new-york'},
+      {name:'North Carolina',slug:'north-carolina'},{name:'North Dakota',slug:'north-dakota'},{name:'Ohio',slug:'ohio'},{name:'Oklahoma',slug:'oklahoma'},
+      {name:'Oregon',slug:'oregon'},{name:'Pennsylvania',slug:'pennsylvania'},{name:'Rhode Island',slug:'rhode-island'},{name:'South Carolina',slug:'south-carolina'},
+      {name:'South Dakota',slug:'south-dakota'},{name:'Tennessee',slug:'tennessee'},{name:'Texas',slug:'texas'},{name:'Utah',slug:'utah'},
+      {name:'Vermont',slug:'vermont'},{name:'Virginia',slug:'virginia'},{name:'Washington',slug:'washington'},{name:'West Virginia',slug:'west-virginia'},
+      {name:'Wisconsin',slug:'wisconsin'},{name:'Wyoming',slug:'wyoming'}
+    ];
+
+    function updateLinks() {
+      var cat = document.getElementById('categorySelect').value;
+      var html = '';
+      states.forEach(function(s) {
+        html += '<a href="/' + cat + '/' + s.slug + '" class="state-link">' + s.name + '</a>';
+      });
+      document.getElementById('stateGrid').innerHTML = html;
+    }
+
+    updateLinks();
+  </script>
+</body>
+</html>

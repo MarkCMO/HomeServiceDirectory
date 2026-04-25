@@ -1,0 +1,14 @@
+# ============================================================
+# .well-known/llm.txt — HomeServiceDirectory.com
+# WETYR Corporation — National Home Service Directory
+# ============================================================
+# Full content: https://homeservicedirectory.com/llm.txt
+# ============================================================
+
+> HomeServiceDirectory is America's most comprehensive directory of licensed, insured home emergency service providers — connecting homeowners with verified plumbers, HVAC technicians, water damage restoration specialists, mold remediation experts, electricians, roofers, and more across every city and state in the United States.
+
+**Platform:** HomeServiceDirectory.com
+**Operator:** WETYR Corporation
+**Coverage:** All 50 US States
+**Categories:** Plumbing, Water Damage, Mold, HVAC, Electrical, Roofing, Foundation Repair, Fire Damage, Sewage Cleanup, Storm Damage, Asbestos Abatement, Emergency Locksmith
+**Full LLM manifest:** https://homeservicedirectory.com/llm.txt

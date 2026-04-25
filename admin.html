@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WETYR Admin | HomeServiceDirectory</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #0f1225; color: #e2e8f0; min-height: 100vh; }
+
+    /* Login */
+    #loginScreen { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .login-box { background: #1a1f3a; border: 1px solid #2d3561; border-radius: 16px; padding: 48px 40px; width: 100%; max-width: 420px; text-align: center; }
+    .login-box h1 { font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 6px; }
+    .login-box p { color: #94a3b8; margin-bottom: 28px; font-size: 0.9rem; }
+    .login-box input { width: 100%; padding: 12px 16px; background: #0f1225; border: 1px solid #2d3561; border-radius: 8px; color: #e2e8f0; font-size: 0.95rem; margin-bottom: 12px; }
+    .login-box input:focus { outline: none; border-color: #DC3545; }
+    .login-btn { width: 100%; padding: 13px; background: #DC3545; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 4px; }
+    .login-btn:hover { background: #b91c2c; }
+    .login-err { color: #f87171; font-size: 0.85rem; margin-top: 8px; min-height: 20px; }
+
+    /* Shell */
+    #appShell { display: none; }
+    .admin-header { background: #1a1f3a; border-bottom: 1px solid #2d3561; padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .admin-logo { font-size: 1.1rem; font-weight: 800; color: #fff; }
+    .admin-logo span { color: #DC3545; }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .header-tag { font-size: 0.75rem; background: #DC3545; color: #fff; padding: 3px 10px; border-radius: 20px; font-weight: 700; }
+    .logout-btn { background: none; border: 1px solid #2d3561; color: #94a3b8; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
+    .logout-btn:hover { background: #2d3561; color: #fff; }
+
+    /* Tabs */
+    .tab-bar { background: #1a1f3a; border-bottom: 1px solid #2d3561; display: flex; overflow-x: auto; padding: 0 24px; }
+    .tab-btn { padding: 14px 20px; background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 0.85rem; font-weight: 600; white-space: nowrap; border-bottom: 3px solid transparent; transition: all 0.15s; }
+    .tab-btn.active { color: #DC3545; border-bottom-color: #DC3545; }
+    .tab-btn:hover:not(.active) { color: #e2e8f0; }
+
+    /* Main content */
+    .admin-main { padding: 28px 24px; max-width: 1400px; margin: 0 auto; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Stat cards */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .stat-card { background: #1a1f3a; border: 1px solid #2d3561; border-radius: 12px; padding: 20px; }
+    .stat-label { font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; }
+    .stat-val { font-size: 2rem; font-weight: 800; color: #fff; line-height: 1; }
+    .stat-sub { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; }
+    .stat-card.red { border-color: #DC3545; }
+    .stat-card.green { border-color: #22c55e; }
+    .stat-card.blue { border-color: #3b82f6; }
+
+    /* Section boxes */
+    .box { background: #1a1f3a; border: 1px solid #2d3561; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+    .box-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .box-title { font-size: 1rem; font-weight: 700; color: #fff; }
+
+    /* Tables */
+    .tbl-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th { text-align: left; padding: 10px 12px; color: #64748b; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #2d3561; }
+    td { padding: 12px; border-bottom: 1px solid #1e2546; color: #cbd5e1; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* Badges */
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
+    .badge-free { background: #1e2546; color: #64748b; }
+    .badge-pro { background: #1d4ed8; color: #93c5fd; }
+    .badge-premium { background: #6d28d9; color: #c4b5fd; }
+    .badge-elite { background: #b45309; color: #fcd34d; }
+    .badge-sponsor { background: #DC3545; color: #fff; }
+    .badge-active { background: #14532d; color: #86efac; }
+    .badge-pending { background: #78350f; color: #fcd34d; }
+    .badge-inactive { background: #3f3f46; color: #a1a1aa; }
+    .badge-standard { background: #1e2546; color: #94a3b8; }
+    .badge-senior { background: #1d3a4d; color: #7dd3fc; }
+    .badge-elite-tier { background: #3b1d8d; color: #c4b5fd; }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; }
+    .btn-red { background: #DC3545; color: #fff; }
+    .btn-red:hover { background: #b91c2c; }
+    .btn-ghost { background: none; border: 1px solid #2d3561; color: #94a3b8; }
+    .btn-ghost:hover { background: #2d3561; color: #fff; }
+    .btn-green { background: #16a34a; color: #fff; }
+    .btn-green:hover { background: #15803d; }
+    .btn-sm { padding: 5px 10px; font-size: 0.75rem; }
+
+    /* Filters bar */
+    .filter-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
+    .filter-bar input, .filter-bar select { padding: 8px 12px; background: #0f1225; border: 1px solid #2d3561; border-radius: 8px; color: #e2e8f0; font-size: 0.85rem; }
+    .filter-bar input { flex: 1; min-width: 160px; }
+
+    /* Inline selects in table */
+    .inline-sel { background: #0f1225; border: 1px solid #2d3561; border-radius: 6px; color: #e2e8f0; padding: 4px 8px; font-size: 0.78rem; cursor: pointer; }
+
+    /* Modal */
+    .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; align-items: center; justify-content: center; }
+    .modal-bg.open { display: flex; }
+    .modal { background: #1a1f3a; border: 1px solid #2d3561; border-radius: 16px; padding: 32px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
+    .modal h2 { font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: 20px; }
+    .form-row { margin-bottom: 14px; }
+    .form-row label { display: block; font-size: 0.8rem; color: #94a3b8; font-weight: 600; margin-bottom: 6px; }
+    .form-row input, .form-row select, .form-row textarea { width: 100%; padding: 10px 12px; background: #0f1225; border: 1px solid #2d3561; border-radius: 8px; color: #e2e8f0; font-size: 0.9rem; }
+    .form-row textarea { resize: vertical; min-height: 80px; }
+    .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
+
+    /* Health rows */
+    .health-ok { color: #22c55e; }
+    .health-warn { color: #f59e0b; }
+    .health-err { color: #f87171; }
+
+    /* Leaderboard */
+    .lb-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #1e2546; }
+    .lb-rank { font-size: 1.2rem; font-weight: 900; color: #64748b; width: 28px; }
+    .lb-rank.gold { color: #fcd34d; }
+    .lb-rank.silver { color: #cbd5e1; }
+    .lb-rank.bronze { color: #f59e0b; }
+    .lb-name { flex: 1; font-weight: 600; color: #fff; font-size: 0.9rem; }
+    .lb-bar-wrap { flex: 2; background: #0f1225; border-radius: 4px; height: 8px; }
+    .lb-bar { height: 8px; border-radius: 4px; background: #DC3545; }
+    .lb-mrr { font-size: 0.85rem; font-weight: 700; color: #22c55e; width: 80px; text-align: right; }
+
+    /* Toast */
+    #toast { position: fixed; bottom: 24px; right: 24px; background: #22c55e; color: #fff; padding: 12px 20px; border-radius: 10px; font-weight: 600; font-size: 0.85rem; z-index: 9999; display: none; }
+    #toast.err { background: #DC3545; }
+
+    /* Spinner */
+    .spinner { border: 3px solid #2d3561; border-top-color: #DC3545; border-radius: 50%; width: 32px; height: 32px; animation: spin 0.7s linear infinite; margin: 40px auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Responsive */
+    @media(max-width:768px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } .admin-main { padding: 16px 12px; } }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <h1>WETYR <span>Admin</span></h1>
+    <p>HomeServiceDirectory Platform Control</p>
+    <input type="email" id="loginEmail" placeholder="admin@email.com" autocomplete="username">
+    <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="appShell">
+  <div class="admin-header">
+    <div class="admin-logo">WETYR <span>Admin</span></div>
+    <div class="header-right">
+      <span class="header-tag">ADMIN</span>
+      <span id="headerEmail" style="font-size:0.8rem;color:#94a3b8;"></span>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+    <button class="tab-btn" onclick="switchTab('listings')">Listings</button>
+    <button class="tab-btn" onclick="switchTab('reps')">Reps</button>
+    <button class="tab-btn" onclick="switchTab('managers')">Managers</button>
+    <button class="tab-btn" onclick="switchTab('commissions')">Commissions</button>
+    <button class="tab-btn" onclick="switchTab('leads')">Leads</button>
+    <button class="tab-btn" onclick="switchTab('health')">Health</button>
+    <button class="tab-btn" onclick="switchTab('tools')">Tools</button>
+  </div>
+
+  <div class="admin-main">
+
+    <!-- OVERVIEW -->
+    <div class="tab-panel active" id="tab-overview">
+      <div class="stat-grid" id="overviewStats"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;flex-wrap:wrap;">
+        <div class="box">
+          <div class="box-header"><div class="box-title">Revenue by Plan</div></div>
+          <div id="planBreakdown"></div>
+        </div>
+        <div class="box">
+          <div class="box-header"><div class="box-title">Top Reps (MRR)</div></div>
+          <div id="miniLeaderboard"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LISTINGS -->
+    <div class="tab-panel" id="tab-listings">
+      <div class="box">
+        <div class="box-header">
+          <div class="box-title">All Providers</div>
+        </div>
+        <div class="filter-bar">
+          <input type="text" id="listSearch" placeholder="Search name, city, email..." oninput="debounce(loadListings, 400)()">
+          <select id="listPlan" onchange="loadListings()">
+            <option value="">All Plans</option>
+            <option value="free">Free</option>
+            <option value="pro">Pro</option>
+            <option value="premium">Premium</option>
+            <option value="elite">Elite</option>
+            <option value="sponsor">Sponsor</option>
+          </select>
+          <select id="listStatus" onchange="loadListings()">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          <select id="listCategory" onchange="loadListings()">
+            <option value="">All Categories</option>
+            <option value="plumbing">Plumbing</option>
+            <option value="water-damage">Water Damage</option>
+            <option value="hvac">HVAC</option>
+            <option value="electrical">Electrical</option>
+            <option value="roofing">Roofing</option>
+            <option value="mold-remediation">Mold</option>
+            <option value="fire-damage">Fire Damage</option>
+            <option value="foundation-repair">Foundation</option>
+            <option value="sewage-cleanup">Sewage</option>
+            <option value="storm-damage">Storm Damage</option>
+            <option value="asbestos-abatement">Asbestos</option>
+            <option value="locksmith">Locksmith</option>
+          </select>
+        </div>
+        <div class="tbl-wrap" id="listingsTableWrap"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- REPS -->
+    <div class="tab-panel" id="tab-reps">
+      <div class="box">
+        <div class="box-header">
+          <div class="box-title">Sales Representatives</div>
+          <button class="btn btn-red" onclick="openModal('repModal')">+ Add Rep</button>
+        </div>
+        <div class="filter-bar">
+          <input type="text" id="repSearch" placeholder="Search name, email, code..." oninput="debounce(loadReps, 400)()">
+          <select id="repStatusFilter" onchange="loadReps()">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+            <option value="inactive">Inactive</option>
+            <option value="terminated">Terminated</option>
+          </select>
+          <select id="repTierFilter" onchange="loadReps()">
+            <option value="">All Tiers</option>
+            <option value="standard">Standard (30%)</option>
+            <option value="senior">Senior (40%)</option>
+            <option value="elite">Elite (50%)</option>
+          </select>
+        </div>
+        <div class="tbl-wrap" id="repsTableWrap"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- MANAGERS -->
+    <div class="tab-panel" id="tab-managers">
+      <div class="box">
+        <div class="box-header">
+          <div class="box-title">Managers / GMs</div>
+          <button class="btn btn-red" onclick="openModal('managerModal')">+ Add Manager</button>
+        </div>
+        <div class="tbl-wrap" id="managersTableWrap"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- COMMISSIONS -->
+    <div class="tab-panel" id="tab-commissions">
+      <div class="stat-grid" id="commissionStats"></div>
+      <div class="box">
+        <div class="box-header">
+          <div class="box-title">Commission Records</div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-green btn-sm" onclick="processVesting()">Run Vesting</button>
+            <select id="commStatusFilter" style="padding:6px 10px;background:#0f1225;border:1px solid #2d3561;border-radius:8px;color:#e2e8f0;font-size:0.82rem;" onchange="loadCommissions()">
+              <option value="">All Status</option>
+              <option value="vesting">Vesting</option>
+              <option value="earned">Earned</option>
+              <option value="paid">Paid</option>
+              <option value="clawed_back">Clawed Back</option>
+            </select>
+          </div>
+        </div>
+        <div class="tbl-wrap" id="commTableWrap"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- LEADS -->
+    <div class="tab-panel" id="tab-leads">
+      <div class="box">
+        <div class="box-header">
+          <div class="box-title">Recent Leads</div>
+        </div>
+        <div class="filter-bar">
+          <select id="leadStatusFilter" onchange="loadLeads()">
+            <option value="">All Status</option>
+            <option value="new">New</option>
+            <option value="forwarded">Forwarded</option>
+            <option value="contacted">Contacted</option>
+            <option value="won">Won</option>
+            <option value="lost">Lost</option>
+          </select>
+          <select id="leadCategory" onchange="loadLeads()">
+            <option value="">All Categories</option>
+            <option value="plumbing">Plumbing</option>
+            <option value="water-damage">Water Damage</option>
+            <option value="hvac">HVAC</option>
+            <option value="electrical">Electrical</option>
+            <option value="roofing">Roofing</option>
+            <option value="mold-remediation">Mold</option>
+          </select>
+        </div>
+        <div class="tbl-wrap" id="leadsTableWrap"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- HEALTH -->
+    <div class="tab-panel" id="tab-health">
+      <div class="box">
+        <div class="box-header">
+          <div class="box-title">System Health</div>
+          <button class="btn btn-ghost btn-sm" onclick="loadHealth()">Refresh</button>
+        </div>
+        <div id="healthContent"><div class="spinner"></div></div>
+      </div>
+      <div class="box">
+        <div class="box-header"><div class="box-title">Top Reps Leaderboard</div></div>
+        <div id="leaderboardContent"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- TOOLS -->
+    <div class="tab-panel" id="tab-tools">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+        <div class="box">
+          <div class="box-title" style="margin-bottom:16px;">Blob to Supabase Migration</div>
+          <p style="color:#94a3b8;font-size:0.85rem;margin-bottom:20px;">One-time migration: reads all Netlify Blob listings and upserts them into Supabase. Safe to run multiple times (upserts by slug).</p>
+          <button class="btn btn-red" onclick="runMigration()" id="migBtn">Run Migration</button>
+          <div id="migResult" style="margin-top:16px;font-size:0.85rem;color:#94a3b8;"></div>
+        </div>
+        <div class="box">
+          <div class="box-title" style="margin-bottom:16px;">Commission Vesting</div>
+          <p style="color:#94a3b8;font-size:0.85rem;margin-bottom:20px;">Manually trigger the vesting processor to mark eligible commissions as earned (runs automatically daily at 6am UTC).</p>
+          <button class="btn btn-green" onclick="processVesting()" id="vestBtn">Process Vesting</button>
+          <div id="vestResult" style="margin-top:16px;font-size:0.85rem;color:#94a3b8;"></div>
+        </div>
+        <div class="box">
+          <div class="box-title" style="margin-bottom:16px;">Rebuild Daily Queues</div>
+          <p style="color:#94a3b8;font-size:0.85rem;margin-bottom:20px;">Manually rebuild today's call queues for all active reps (runs automatically at 12pm EST).</p>
+          <button class="btn btn-ghost" onclick="rebuildQueues()" id="queueBtn">Rebuild Queues</button>
+          <div id="queueResult" style="margin-top:16px;font-size:0.85rem;color:#94a3b8;"></div>
+        </div>
+        <div class="box">
+          <div class="box-title" style="margin-bottom:16px;">Admin Account Setup</div>
+          <p style="color:#94a3b8;font-size:0.85rem;margin-bottom:20px;">Create first admin account. Requires ADMIN_SETUP_KEY env var. Only works if no admins exist.</p>
+          <a href="/api/admin-setup" target="_blank" class="btn btn-ghost" style="text-decoration:none;">View Setup Endpoint</a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /admin-main -->
+</div><!-- /appShell -->
+
+<!-- ADD REP MODAL -->
+<div class="modal-bg" id="repModal">
+  <div class="modal">
+    <h2>Add Sales Rep</h2>
+    <div class="form-row"><label>Full Name *</label><input id="repName" placeholder="Jane Smith"></div>
+    <div class="form-row"><label>Email *</label><input type="email" id="repEmail" placeholder="jane@example.com"></div>
+    <div class="form-row"><label>Phone</label><input id="repPhone" placeholder="+1 (555) 000-0000"></div>
+    <div class="form-row"><label>Password *</label><input type="password" id="repPassword" placeholder="Minimum 8 characters"></div>
+    <div class="form-row"><label>Tier</label>
+      <select id="repTier">
+        <option value="standard">Standard (30%)</option>
+        <option value="senior">Senior (40%)</option>
+        <option value="elite">Elite (50%)</option>
+      </select>
+    </div>
+    <div class="form-row"><label>Manager ID (optional)</label><input id="repManagerId" placeholder="UUID of manager"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('repModal')">Cancel</button>
+      <button class="btn btn-red" onclick="createRep()">Create Rep</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD MANAGER MODAL -->
+<div class="modal-bg" id="managerModal">
+  <div class="modal">
+    <h2>Add Manager / GM</h2>
+    <div class="form-row"><label>Full Name *</label><input id="mgrName" placeholder="John Manager"></div>
+    <div class="form-row"><label>Email *</label><input type="email" id="mgrEmail" placeholder="john@example.com"></div>
+    <div class="form-row"><label>Phone</label><input id="mgrPhone" placeholder="+1 (555) 000-0000"></div>
+    <div class="form-row"><label>Password *</label><input type="password" id="mgrPassword" placeholder="Minimum 8 characters"></div>
+    <div class="form-row"><label>Override Rate (%)</label>
+      <select id="mgrOverride">
+        <option value="5">5%</option>
+        <option value="7">7%</option>
+        <option value="10" selected>10%</option>
+        <option value="12">12%</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('managerModal')">Cancel</button>
+      <button class="btn btn-red" onclick="createManager()">Create Manager</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  const API = '/api';
+  let authToken = localStorage.getItem('admin_token') || '';
+  let currentTab = 'overview';
+  let debounceTimers = {};
+
+  // ── Auth ────────────────────────────────────────────────────────────
+  async function doLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const pass  = document.getElementById('loginPass').value;
+    document.getElementById('loginErr').textContent = '';
+    if (!email || !pass) { document.getElementById('loginErr').textContent = 'Email and password required.'; return; }
+
+    try {
+      const res = await fetch(API + '/auth-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pass, role: 'admin' })
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        document.getElementById('loginErr').textContent = data.error || 'Login failed';
+        return;
+      }
+      authToken = data.token;
+      localStorage.setItem('admin_token', authToken);
+      document.getElementById('headerEmail').textContent = email;
+      showApp();
+    } catch(e) {
+      document.getElementById('loginErr').textContent = 'Network error. Try again.';
+    }
+  }
+
+  async function verifyToken() {
+    if (!authToken) return false;
+    try {
+      const res = await fetch(API + '/auth-session', { headers: { 'Authorization': 'Bearer ' + authToken } });
+      const data = await res.json();
+      if (res.ok && data.user_type === 'admin') {
+        document.getElementById('headerEmail').textContent = data.email || '';
+        return true;
+      }
+    } catch(e) {}
+    return false;
+  }
+
+  async function doLogout() {
+    try { await fetch(API + '/auth-logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + authToken } }); } catch(e) {}
+    authToken = '';
+    localStorage.removeItem('admin_token');
+    document.getElementById('appShell').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+  }
+
+  function showApp() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appShell').style.display = 'block';
+    switchTab('overview');
+  }
+
+  // ── Tabs ────────────────────────────────────────────────────────────
+  function switchTab(name) {
+    currentTab = name;
+    document.querySelectorAll('.tab-btn').forEach((b,i) => {
+      const tabs = ['overview','listings','reps','managers','commissions','leads','health','tools'];
+      b.classList.toggle('active', tabs[i] === name);
+    });
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    loadTab(name);
+  }
+
+  function loadTab(name) {
+    if (name === 'overview')     loadOverview();
+    if (name === 'listings')     loadListings();
+    if (name === 'reps')         loadReps();
+    if (name === 'managers')     loadManagers();
+    if (name === 'commissions')  loadCommissions();
+    if (name === 'leads')        loadLeads();
+    if (name === 'health')       { loadHealth(); loadLeaderboard(); }
+  }
+
+  // ── API helper ──────────────────────────────────────────────────────
+  async function api(path, opts = {}) {
+    const res = await fetch(API + path, {
+      ...opts,
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken, ...(opts.headers || {}) }
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.status === 401) { doLogout(); throw new Error('Unauthorized'); }
+    return { ok: res.ok, data, status: res.status };
+  }
+
+  // ── Overview ────────────────────────────────────────────────────────
+  async function loadOverview() {
+    document.getElementById('overviewStats').innerHTML = '<div class="spinner"></div>';
+    try {
+      const { data } = await api('/admin-platform?action=dashboard');
+      const s = data.stats || {};
+      const statsHtml = [
+        { label: 'Total Providers',   val: s.total_providers   || 0, cls: '' },
+        { label: 'Paid Subscribers',  val: s.paid_providers    || 0, cls: 'green' },
+        { label: 'Active Reps',       val: s.active_reps       || 0, cls: '' },
+        { label: 'Managers',          val: s.managers          || 0, cls: '' },
+        { label: 'Gross MRR',         val: '$' + fmt$(s.gross_mrr_cents), cls: 'green' },
+        { label: 'Commissions Owed',  val: '$' + fmt$(s.commissions_owed_cents), cls: 'red' },
+        { label: 'Net MRR',           val: '$' + fmt$(s.net_mrr_cents), cls: 'green' },
+        { label: 'Leads (30d)',        val: s.leads_30d         || 0, cls: 'blue' },
+      ].map(x => `<div class="stat-card ${x.cls}"><div class="stat-label">${x.label}</div><div class="stat-val">${x.val}</div></div>`).join('');
+      document.getElementById('overviewStats').innerHTML = statsHtml;
+
+      // Plan breakdown
+      const plans = data.plan_breakdown || [];
+      document.getElementById('planBreakdown').innerHTML = plans.length ? `
+        <table><thead><tr><th>Plan</th><th>Count</th><th>MRR</th></tr></thead><tbody>
+        ${plans.map(p => `<tr><td><span class="badge badge-${p.plan}">${p.plan}</span></td><td>${p.count}</td><td style="color:#22c55e;">$${fmt$(p.mrr_cents)}</td></tr>`).join('')}
+        </tbody></table>` : '<p style="color:#64748b;font-size:0.85rem;">No plan data yet</p>';
+
+      // Mini leaderboard
+      const lb = data.leaderboard || [];
+      document.getElementById('miniLeaderboard').innerHTML = lb.slice(0,5).map((r,i) => {
+        const cls = i===0?'gold':i===1?'silver':i===2?'bronze':'';
+        return `<div class="lb-row"><div class="lb-rank ${cls}">${i+1}</div><div class="lb-name">${r.name}</div><div class="lb-mrr">$${fmt$(r.mrr_cents)}</div></div>`;
+      }).join('') || '<p style="color:#64748b;font-size:0.85rem;">No rep data yet</p>';
+    } catch(e) {
+      document.getElementById('overviewStats').innerHTML = '<p style="color:#f87171;">Failed to load overview: ' + e.message + '</p>';
+    }
+  }
+
+  // ── Listings ────────────────────────────────────────────────────────
+  async function loadListings() {
+    document.getElementById('listingsTableWrap').innerHTML = '<div class="spinner"></div>';
+    const q = new URLSearchParams({
+      search:   document.getElementById('listSearch').value,
+      plan:     document.getElementById('listPlan').value,
+      status:   document.getElementById('listStatus').value,
+      category: document.getElementById('listCategory').value,
+      limit:    50
+    });
+    try {
+      const { data } = await api('/admin-listings?' + q);
+      const listings = data.listings || data || [];
+      if (!listings.length) { document.getElementById('listingsTableWrap').innerHTML = '<p style="color:#64748b;padding:20px 0;">No listings found.</p>'; return; }
+      document.getElementById('listingsTableWrap').innerHTML = `
+        <table>
+          <thead><tr><th>Name</th><th>City/State</th><th>Plan</th><th>Status</th><th>Email</th><th>Created</th><th></th></tr></thead>
+          <tbody>${listings.map(l => `
+            <tr>
+              <td style="font-weight:600;color:#fff;">${esc(l.name)}</td>
+              <td style="color:#94a3b8;">${esc(l.city)}, ${esc(l.state)}</td>
+              <td><span class="badge badge-${l.plan||'free'}">${l.plan||'free'}</span></td>
+              <td><span class="badge badge-${l.status||'active'}">${l.status||'active'}</span></td>
+              <td style="color:#94a3b8;font-size:0.8rem;">${esc(l.email||'')}</td>
+              <td style="color:#64748b;font-size:0.78rem;">${fmtDate(l.created_at||l.submittedAt)}</td>
+              <td><a href="/listing?id=${esc(l.slug||l.id)}" target="_blank" class="btn btn-ghost btn-sm">View</a></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`;
+    } catch(e) {
+      document.getElementById('listingsTableWrap').innerHTML = '<p style="color:#f87171;">Load error: ' + e.message + '</p>';
+    }
+  }
+
+  // ── Reps ────────────────────────────────────────────────────────────
+  async function loadReps() {
+    document.getElementById('repsTableWrap').innerHTML = '<div class="spinner"></div>';
+    const q = new URLSearchParams({
+      search: document.getElementById('repSearch').value,
+      status: document.getElementById('repStatusFilter').value,
+      tier:   document.getElementById('repTierFilter').value,
+      limit:  100
+    });
+    try {
+      const { data } = await api('/admin-reps?' + q);
+      const reps = data.reps || [];
+      if (!reps.length) { document.getElementById('repsTableWrap').innerHTML = '<p style="color:#64748b;padding:20px 0;">No reps found.</p>'; return; }
+      document.getElementById('repsTableWrap').innerHTML = `
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Tier</th><th>Status</th><th>Code</th><th>Clients</th><th>MRR</th><th>Actions</th></tr></thead>
+          <tbody>${reps.map(r => `
+            <tr>
+              <td style="font-weight:600;color:#fff;">${esc(r.name)}</td>
+              <td style="color:#94a3b8;font-size:0.82rem;">${esc(r.email)}</td>
+              <td>
+                <select class="inline-sel" onchange="updateRep('${r.id}','tier',this.value)">
+                  <option value="standard" ${r.tier==='standard'?'selected':''}>Standard 30%</option>
+                  <option value="senior"   ${r.tier==='senior'?'selected':''}>Senior 40%</option>
+                  <option value="elite"    ${r.tier==='elite'?'selected':''}>Elite 50%</option>
+                </select>
+              </td>
+              <td>
+                <select class="inline-sel" onchange="updateRep('${r.id}','status',this.value)">
+                  <option value="pending"    ${r.status==='pending'?'selected':''}>Pending</option>
+                  <option value="active"     ${r.status==='active'?'selected':''}>Active</option>
+                  <option value="inactive"   ${r.status==='inactive'?'selected':''}>Inactive</option>
+                  <option value="terminated" ${r.status==='terminated'?'selected':''}>Terminated</option>
+                </select>
+              </td>
+              <td style="font-family:monospace;font-size:0.8rem;color:#94a3b8;">${esc(r.referral_code||'')}</td>
+              <td style="text-align:center;">${r.active_clients||0}</td>
+              <td style="color:#22c55e;font-weight:700;">$${fmt$(r.mrr_cents)}</td>
+              <td><button class="btn btn-ghost btn-sm" onclick="deleteRep('${r.id}','${esc(r.name)}')">Term.</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`;
+    } catch(e) {
+      document.getElementById('repsTableWrap').innerHTML = '<p style="color:#f87171;">Load error: ' + e.message + '</p>';
+    }
+  }
+
+  async function updateRep(id, field, val) {
+    try {
+      const { ok, data } = await api('/admin-reps', { method: 'PATCH', body: JSON.stringify({ rep_id: id, [field]: val }) });
+      if (ok) toast('Rep updated'); else toast(data.error || 'Update failed', true);
+    } catch(e) { toast('Error: ' + e.message, true); }
+  }
+
+  async function deleteRep(id, name) {
+    if (!confirm('Terminate rep ' + name + '? This sets status to terminated.')) return;
+    try {
+      const { ok, data } = await api('/admin-reps?rep_id=' + id, { method: 'DELETE' });
+      if (ok) { toast('Rep terminated'); loadReps(); } else toast(data.error || 'Failed', true);
+    } catch(e) { toast('Error', true); }
+  }
+
+  async function createRep() {
+    const body = {
+      name:       document.getElementById('repName').value.trim(),
+      email:      document.getElementById('repEmail').value.trim(),
+      phone:      document.getElementById('repPhone').value.trim(),
+      password:   document.getElementById('repPassword').value,
+      tier:       document.getElementById('repTier').value,
+      manager_id: document.getElementById('repManagerId').value.trim() || undefined
+    };
+    if (!body.name || !body.email || !body.password) { toast('Name, email, and password required', true); return; }
+    try {
+      const { ok, data } = await api('/admin-reps', { method: 'POST', body: JSON.stringify(body) });
+      if (ok) { toast('Rep created!'); closeModal('repModal'); loadReps(); }
+      else toast(data.error || 'Create failed', true);
+    } catch(e) { toast('Error: ' + e.message, true); }
+  }
+
+  // ── Managers ────────────────────────────────────────────────────────
+  async function loadManagers() {
+    document.getElementById('managersTableWrap').innerHTML = '<div class="spinner"></div>';
+    try {
+      const { data } = await api('/admin-managers');
+      const mgrs = data.managers || [];
+      if (!mgrs.length) { document.getElementById('managersTableWrap').innerHTML = '<p style="color:#64748b;padding:20px 0;">No managers yet.</p>'; return; }
+      document.getElementById('managersTableWrap').innerHTML = `
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Override %</th><th>Active Reps</th><th>Team MRR</th><th>Override Earned</th><th>Status</th></tr></thead>
+          <tbody>${mgrs.map(m => `
+            <tr>
+              <td style="font-weight:600;color:#fff;">${esc(m.name)}</td>
+              <td style="color:#94a3b8;font-size:0.82rem;">${esc(m.email)}</td>
+              <td style="color:#f59e0b;font-weight:700;">${m.override_pct||10}%</td>
+              <td style="text-align:center;">${m.active_reps||0}</td>
+              <td style="color:#22c55e;font-weight:700;">$${fmt$(m.team_mrr_cents)}</td>
+              <td style="color:#fcd34d;font-weight:700;">$${fmt$((m.team_mrr_cents||0)*(m.override_pct||10)/100)}</td>
+              <td><span class="badge badge-${m.status||'active'}">${m.status||'active'}</span></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`;
+    } catch(e) {
+      document.getElementById('managersTableWrap').innerHTML = '<p style="color:#f87171;">Load error: ' + e.message + '</p>';
+    }
+  }
+
+  async function createManager() {
+    const body = {
+      name:         document.getElementById('mgrName').value.trim(),
+      email:        document.getElementById('mgrEmail').value.trim(),
+      phone:        document.getElementById('mgrPhone').value.trim(),
+      password:     document.getElementById('mgrPassword').value,
+      override_pct: parseInt(document.getElementById('mgrOverride').value)
+    };
+    if (!body.name || !body.email || !body.password) { toast('Name, email, and password required', true); return; }
+    try {
+      const { ok, data } = await api('/admin-managers', { method: 'POST', body: JSON.stringify(body) });
+      if (ok) { toast('Manager created!'); closeModal('managerModal'); loadManagers(); }
+      else toast(data.error || 'Create failed', true);
+    } catch(e) { toast('Error: ' + e.message, true); }
+  }
+
+  // ── Commissions ─────────────────────────────────────────────────────
+  async function loadCommissions() {
+    document.getElementById('commTableWrap').innerHTML = '<div class="spinner"></div>';
+    try {
+      const { data: sumData } = await api('/admin-commissions?action=summary');
+      const s = sumData.summary || {};
+      document.getElementById('commissionStats').innerHTML = [
+        { label: 'Vesting',    val: '$' + fmt$(s.vesting_cents),    cls: '' },
+        { label: 'Earned',     val: '$' + fmt$(s.earned_cents),     cls: 'green' },
+        { label: 'Paid',       val: '$' + fmt$(s.paid_cents),       cls: '' },
+        { label: 'Clawed Back',val: '$' + fmt$(s.clawed_back_cents),cls: 'red' },
+      ].map(x => `<div class="stat-card ${x.cls}"><div class="stat-label">${x.label}</div><div class="stat-val">${x.val}</div></div>`).join('');
+
+      const status = document.getElementById('commStatusFilter').value;
+      const q = status ? '?status=' + status : '';
+      const { data } = await api('/admin-commissions' + q);
+      const comms = data.commissions || [];
+      if (!comms.length) { document.getElementById('commTableWrap').innerHTML = '<p style="color:#64748b;padding:20px 0;">No commission records.</p>'; return; }
+      document.getElementById('commTableWrap').innerHTML = `
+        <table>
+          <thead><tr><th>Rep</th><th>Amount</th><th>Pct</th><th>Status</th><th>Vesting Date</th><th>Actions</th></tr></thead>
+          <tbody>${comms.map(c => `
+            <tr>
+              <td style="font-weight:600;color:#fff;">${esc(c.rep_name||c.rep_id||'')}</td>
+              <td style="color:#22c55e;font-weight:700;">$${fmt$(c.amount_cents)}</td>
+              <td style="color:#94a3b8;">${c.commission_pct}%</td>
+              <td><span class="badge badge-${c.status}">${c.status}</span></td>
+              <td style="color:#64748b;font-size:0.8rem;">${fmtDate(c.vesting_date)}</td>
+              <td style="display:flex;gap:6px;">
+                ${c.status==='earned'?`<button class="btn btn-green btn-sm" onclick="markPaid('${c.id}')">Mark Paid</button>`:''}
+                ${['vesting','earned'].includes(c.status)?`<button class="btn btn-ghost btn-sm" onclick="clawback('${c.id}')">Clawback</button>`:''}
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`;
+    } catch(e) {
+      document.getElementById('commTableWrap').innerHTML = '<p style="color:#f87171;">Load error: ' + e.message + '</p>';
+    }
+  }
+
+  async function markPaid(id) {
+    const { ok, data } = await api('/admin-commissions', { method: 'PATCH', body: JSON.stringify({ action: 'mark_paid', commission_id: id }) });
+    if (ok) { toast('Marked paid'); loadCommissions(); } else toast(data.error || 'Failed', true);
+  }
+  async function clawback(id) {
+    if (!confirm('Clawback this commission?')) return;
+    const { ok, data } = await api('/admin-commissions', { method: 'PATCH', body: JSON.stringify({ action: 'clawback', commission_id: id }) });
+    if (ok) { toast('Commission clawed back'); loadCommissions(); } else toast(data.error || 'Failed', true);
+  }
+  async function processVesting() {
+    const btn = document.getElementById('vestBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Processing...'; }
+    toast('Running vesting...');
+    const { ok, data } = await api('/admin-commissions', { method: 'PATCH', body: JSON.stringify({ action: 'process_vesting' }) });
+    if (btn) { btn.disabled = false; btn.textContent = 'Process Vesting'; }
+    if (ok) {
+      toast('Vesting complete: ' + (data.vested||0) + ' commissions vested');
+      document.getElementById('vestResult') && (document.getElementById('vestResult').textContent = 'Vested: ' + (data.vested||0));
+      loadCommissions();
+    } else {
+      toast(data.error || 'Vesting failed', true);
+    }
+  }
+
+  // ── Leads ────────────────────────────────────────────────────────────
+  async function loadLeads() {
+    document.getElementById('leadsTableWrap').innerHTML = '<div class="spinner"></div>';
+    const q = new URLSearchParams({
+      status:   document.getElementById('leadStatusFilter').value,
+      category: document.getElementById('leadCategory').value,
+      limit:    100
+    });
+    try {
+      const { data } = await api('/admin-leads?' + q);
+      const leads = data.leads || [];
+      if (!leads.length) { document.getElementById('leadsTableWrap').innerHTML = '<p style="color:#64748b;padding:20px 0;">No leads found.</p>'; return; }
+      document.getElementById('leadsTableWrap').innerHTML = `
+        <table>
+          <thead><tr><th>Name</th><th>Category</th><th>City/State</th><th>Status</th><th>Provider</th><th>Date</th></tr></thead>
+          <tbody>${leads.map(l => `
+            <tr>
+              <td style="font-weight:600;color:#fff;">${esc(l.contact_name||l.name||'Anonymous')}</td>
+              <td><span class="badge badge-pro">${esc(l.category||'')}</span></td>
+              <td style="color:#94a3b8;">${esc(l.city||'')}, ${esc(l.state||'')}</td>
+              <td><span class="badge badge-${l.status||'new'}">${l.status||'new'}</span></td>
+              <td style="color:#94a3b8;font-size:0.82rem;">${esc(l.provider_name||l.provider_id||'')}</td>
+              <td style="color:#64748b;font-size:0.78rem;">${fmtDate(l.created_at||l.submittedAt)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`;
+    } catch(e) {
+      document.getElementById('leadsTableWrap').innerHTML = '<p style="color:#f87171;">Load error: ' + e.message + '</p>';
+    }
+  }
+
+  // ── Health ────────────────────────────────────────────────────────────
+  async function loadHealth() {
+    document.getElementById('healthContent').innerHTML = '<div class="spinner"></div>';
+    try {
+      const { data } = await api('/admin-platform?action=health');
+      const h = data.health || {};
+      document.getElementById('healthContent').innerHTML = `
+        <table>
+          <thead><tr><th>Check</th><th>Value</th><th>Status</th></tr></thead>
+          <tbody>
+            ${healthRow('Zombie Sessions',     h.zombie_sessions,     0)}
+            ${healthRow('Pending Commissions', h.pending_commissions, 0)}
+            ${healthRow('Failed Emails (24h)', h.failed_emails_24h,   0)}
+            ${healthRow('Overdue Queues',      h.overdue_queues,      0)}
+            ${healthRow('Unprocessed Events',  h.unprocessed_events,  0)}
+          </tbody>
+        </table>`;
+    } catch(e) {
+      document.getElementById('healthContent').innerHTML = '<p style="color:#f87171;">Failed: ' + e.message + '</p>';
+    }
+  }
+
+  function healthRow(label, val, okVal) {
+    const v    = val || 0;
+    const cls  = v <= okVal ? 'health-ok' : v < 10 ? 'health-warn' : 'health-err';
+    const icon = v <= okVal ? '✓' : v < 10 ? '⚠' : '✕';
+    return `<tr><td style="color:#e2e8f0;">${label}</td><td class="${cls}" style="font-weight:700;">${v}</td><td class="${cls}">${icon}</td></tr>`;
+  }
+
+  async function loadLeaderboard() {
+    document.getElementById('leaderboardContent').innerHTML = '<div class="spinner"></div>';
+    try {
+      const { data } = await api('/admin-platform?action=leaderboard');
+      const lb = data.leaderboard || [];
+      if (!lb.length) { document.getElementById('leaderboardContent').innerHTML = '<p style="color:#64748b;">No rep data yet.</p>'; return; }
+      const maxMrr = Math.max(...lb.map(r => r.mrr_cents||0)) || 1;
+      document.getElementById('leaderboardContent').innerHTML = lb.slice(0,10).map((r,i) => {
+        const cls = i===0?'gold':i===1?'silver':i===2?'bronze':'';
+        const pct = Math.round((r.mrr_cents||0) / maxMrr * 100);
+        return `<div class="lb-row">
+          <div class="lb-rank ${cls}">${i+1}</div>
+          <div class="lb-name">${esc(r.name)}<span style="color:#64748b;font-size:0.75rem;margin-left:8px;">${r.active_clients||0} clients</span></div>
+          <div class="lb-bar-wrap"><div class="lb-bar" style="width:${pct}%"></div></div>
+          <div class="lb-mrr">$${fmt$(r.mrr_cents)}</div>
+        </div>`;
+      }).join('');
+    } catch(e) {
+      document.getElementById('leaderboardContent').innerHTML = '<p style="color:#f87171;">Failed: ' + e.message + '</p>';
+    }
+  }
+
+  // ── Tools ─────────────────────────────────────────────────────────────
+  async function runMigration() {
+    const btn = document.getElementById('migBtn');
+    btn.disabled = true; btn.textContent = 'Running...';
+    document.getElementById('migResult').textContent = 'Migration in progress...';
+    try {
+      const { ok, data } = await api('/blob-to-supabase', { method: 'POST' });
+      document.getElementById('migResult').textContent = data.message || JSON.stringify(data);
+      if (ok) toast('Migration complete: ' + (data.migrated||0) + ' migrated');
+      else toast(data.error || 'Migration failed', true);
+    } catch(e) {
+      document.getElementById('migResult').textContent = 'Error: ' + e.message;
+      toast('Error', true);
+    }
+    btn.disabled = false; btn.textContent = 'Run Migration';
+  }
+
+  async function rebuildQueues() {
+    const btn = document.getElementById('queueBtn');
+    btn.disabled = true; btn.textContent = 'Rebuilding...';
+    document.getElementById('queueResult').textContent = 'Building queues...';
+    try {
+      const res = await fetch('/api/queue-builder', { method: 'POST', headers: { 'Authorization': 'Bearer ' + authToken } });
+      const data = await res.json().catch(() => ({}));
+      document.getElementById('queueResult').textContent = data.message || JSON.stringify(data);
+      toast('Queues rebuilt: ' + (data.queues_built||0) + ' reps');
+    } catch(e) {
+      document.getElementById('queueResult').textContent = 'Error: ' + e.message;
+      toast('Error', true);
+    }
+    btn.disabled = false; btn.textContent = 'Rebuild Queues';
+  }
+
+  // ── Modals ─────────────────────────────────────────────────────────────
+  function openModal(id)  { document.getElementById(id).classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+  document.addEventListener('click', e => {
+    if (e.target.classList.contains('modal-bg')) e.target.classList.remove('open');
+  });
+
+  // ── Helpers ────────────────────────────────────────────────────────────
+  function fmt$(cents) {
+    if (!cents) return '0';
+    return (cents / 100).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+  function fmtDate(d) {
+    if (!d) return '';
+    try { return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }); } catch(e) { return ''; }
+  }
+  function esc(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function toast(msg, isErr = false) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = isErr ? 'err' : '';
+    el.style.display = 'block';
+    clearTimeout(el._t);
+    el._t = setTimeout(() => { el.style.display = 'none'; }, 3500);
+  }
+  function debounce(fn, ms) {
+    return function() {
+      const key = fn.name || 'fn';
+      clearTimeout(debounceTimers[key]);
+      debounceTimers[key] = setTimeout(() => fn(), ms);
+    };
+  }
+
+  // ── Init ───────────────────────────────────────────────────────────────
+  (async function init() {
+    if (authToken) {
+      const valid = await verifyToken();
+      if (valid) { showApp(); return; }
+    }
+    // fallback: check for legacy admin key in URL or localStorage
+    document.getElementById('loginScreen').style.display = 'flex';
+  })();
+</script>
+</body>
+</html>

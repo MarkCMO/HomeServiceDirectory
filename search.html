@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Home Service Providers | HomeServiceDirectory</title>
+  <meta name="description" content="Search for trusted home service professionals. Filter by service type, location, and emergency availability. Plumbing, HVAC, water damage, mold, roofing, electrical, and more.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://homeservicedirectory.com/search">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared.css">
+</head>
+<body>
+
+  <section class="directory-hero" style="padding:100px 0 40px;">
+    <div class="container">
+      <h1>Search <span style="color:var(--red);">Providers</span></h1>
+      <p>Find trusted home service professionals near you</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0;">
+    <div class="container">
+
+      <!-- Filter Bar -->
+      <div class="filter-bar" style="margin-top:-20px;">
+        <select id="filterCategory" style="flex:1;">
+          <option value="">All Services</option>
+          <option value="plumbing">Plumbing</option>
+          <option value="water-damage">Water Damage</option>
+          <option value="mold-remediation">Mold Remediation</option>
+          <option value="hvac">HVAC</option>
+          <option value="electrical">Electrical</option>
+          <option value="roofing">Roofing</option>
+          <option value="foundation-repair">Foundation Repair</option>
+          <option value="fire-damage">Fire & Smoke</option>
+          <option value="sewage-cleanup">Sewage Cleanup</option>
+          <option value="storm-damage">Storm Damage</option>
+          <option value="asbestos-abatement">Asbestos Abatement</option>
+          <option value="locksmith">Locksmith</option>
+        </select>
+        <input type="text" id="filterLocation" placeholder="City or state..." style="flex:1;">
+        <label style="display:flex;align-items:center;gap:6px;font-size:0.88rem;font-weight:500;white-space:nowrap;cursor:pointer;">
+          <input type="checkbox" id="filterEmergency"> 24/7 Only
+        </label>
+        <select id="filterSort">
+          <option value="featured">Featured First</option>
+          <option value="rating">Highest Rated</option>
+          <option value="reviews">Most Reviews</option>
+          <option value="name">Alphabetical</option>
+        </select>
+        <button onclick="searchProviders()" class="btn btn-primary btn-sm">Search</button>
+      </div>
+
+      <!-- Results -->
+      <div id="resultsInfo" style="margin-bottom:16px;font-size:0.88rem;color:var(--dark-gray);"></div>
+      <div id="resultsGrid" class="grid-3"></div>
+      <div id="loadMore" style="text-align:center;margin-top:32px;display:none;">
+        <button onclick="loadMoreResults()" class="btn btn-secondary">Load More</button>
+      </div>
+      <div id="noResults" style="display:none;text-align:center;padding:60px 0;">
+        <span style="font-size:3rem;display:block;margin-bottom:12px;">&#x1F50D;</span>
+        <h3>No providers found</h3>
+        <p style="color:var(--dark-gray);">Try broadening your search or <a href="/list-your-business">list your business</a> to be the first!</p>
+      </div>
+    </div>
+  </section>
+
+  <script src="/shared-layout.js"></script>
+  <script>
+    const CATEGORIES = {
+      'plumbing': { title: 'Plumbing', emoji: '&#x1F527;' },
+      'water-damage': { title: 'Water Damage', emoji: '&#x1F4A7;' },
+      'mold-remediation': { title: 'Mold', emoji: '&#x1F9A0;' },
+      'hvac': { title: 'HVAC', emoji: '&#x2744;&#xFE0F;' },
+      'electrical': { title: 'Electrical', emoji: '&#x26A1;' },
+      'roofing': { title: 'Roofing', emoji: '&#x1F3E0;' },
+      'foundation-repair': { title: 'Foundation', emoji: '&#x1F3D7;&#xFE0F;' },
+      'fire-damage': { title: 'Fire/Smoke', emoji: '&#x1F525;' },
+      'sewage-cleanup': { title: 'Sewage', emoji: '&#x2623;&#xFE0F;' },
+      'storm-damage': { title: 'Storm', emoji: '&#x1F32A;&#xFE0F;' },
+      'asbestos-abatement': { title: 'Asbestos', emoji: '&#x26A0;&#xFE0F;' },
+      'locksmith': { title: 'Locksmith', emoji: '&#x1F511;' }
+    };
+
+    let currentOffset = 0;
+    const LIMIT = 24;
+
+    // Check URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('q')) document.getElementById('filterLocation').value = urlParams.get('q');
+    if (urlParams.get('category')) document.getElementById('filterCategory').value = urlParams.get('category');
+
+    function renderCard(l) {
+      const cat = (l.categories && l.categories[0]) || '';
+      const catInfo = CATEGORIES[cat] || { title: '', emoji: '' };
+      const isPaid = l.plan === 'pro' || l.plan === 'premium' || l.plan === 'elite' || l.plan === 'sponsor';
+      let badges = '';
+      if (l.is24x7) badges += '<span class="badge emergency">24/7</span>';
+      if (isPaid) badges += '<span class="badge premium">Featured</span>';
+      if (l.plan === 'elite' || l.plan === 'sponsor') badges += '<span class="badge verified">Verified</span>';
+
+      return `<a href="/listing/${l.slug}" class="listing-card" style="text-decoration:none;">
+        <div class="card-img">${catInfo.emoji || '&#x1F3E0;'}</div>
+        <div class="card-body">
+          <h3>${l.name || 'Unnamed Provider'}</h3>
+          <div class="location">${l.city || ''}, ${l.state || ''}</div>
+          <div class="tags">${badges}</div>
+          ${l.rating ? '<div class="rating">' + '&#9733;'.repeat(Math.round(l.rating)) + ' <span>' + l.rating.toFixed(1) + (l.reviewCount ? ' (' + l.reviewCount + ')' : '') + '</span></div>' : ''}
+        </div>
+      </a>`;
+    }
+
+    async function searchProviders(append) {
+      if (!append) {
+        currentOffset = 0;
+        document.getElementById('resultsGrid').innerHTML = '';
+      }
+
+      const cat = document.getElementById('filterCategory').value;
+      const loc = document.getElementById('filterLocation').value.trim().toLowerCase().replace(/\s+/g, '-');
+      const emergency = document.getElementById('filterEmergency').checked;
+      const sort = document.getElementById('filterSort').value;
+
+      let url = '/api/approved-listings?limit=' + LIMIT + '&offset=' + currentOffset + '&sort=' + sort;
+      if (cat) url += '&category=' + cat;
+      if (loc) url += '&state=' + loc;
+      if (emergency) url += '&emergency=true';
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!data.listings || !data.listings.length) {
+          if (!append) {
+            document.getElementById('noResults').style.display = 'block';
+            document.getElementById('resultsInfo').textContent = '';
+          }
+          document.getElementById('loadMore').style.display = 'none';
+          return;
+        }
+
+        document.getElementById('noResults').style.display = 'none';
+        document.getElementById('resultsInfo').textContent = data.total + ' provider' + (data.total !== 1 ? 's' : '') + ' found';
+
+        const grid = document.getElementById('resultsGrid');
+        data.listings.forEach(function(l) {
+          grid.insertAdjacentHTML('beforeend', renderCard(l));
+        });
+
+        currentOffset += LIMIT;
+        document.getElementById('loadMore').style.display = data.hasMore ? 'block' : 'none';
+      } catch (e) {
+        console.error('Search error:', e);
+      }
+    }
+
+    function loadMoreResults() { searchProviders(true); }
+
+    // Auto-search on load if params
+    if (urlParams.get('q') || urlParams.get('category')) searchProviders();
+
+    // Enter key triggers search
+    document.getElementById('filterLocation').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') searchProviders();
+    });
+  </script>
+</body>
+</html>

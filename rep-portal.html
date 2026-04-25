@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rep Portal - HomeServiceDirectory</title>
+  <link rel="stylesheet" href="/shared.css" />
+  <style>
+    :root {
+      --red: #DC3545;
+      --red-dark: #b02a37;
+      --navy: #1a1f36;
+      --navy-light: #252b47;
+      --navy-lighter: #2f3659;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --border: #374162;
+      --card-bg: #252b47;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --info: #3b82f6;
+      --radius: 8px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ---- LOGIN ---- */
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--navy);
+      padding: 1rem;
+    }
+    .login-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 400px;
+    }
+    .login-card .logo {
+      text-align: center;
+      margin-bottom: 1.75rem;
+    }
+    .login-card .logo h1 { font-size: 1.4rem; color: var(--red); font-weight: 700; }
+    .login-card .logo p { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      background: var(--navy-lighter);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      padding: 0.6rem 0.85rem;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: var(--red);
+    }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-primary { background: var(--red); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--red-dark); }
+    .btn-secondary { background: var(--navy-lighter); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover:not(:disabled) { background: var(--border); }
+    .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.82rem; }
+    .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+    .btn-ghost:hover:not(:disabled) { background: var(--navy-lighter); color: var(--text); }
+    .btn-full { width: 100%; justify-content: center; }
+    .error-msg { background: rgba(220,53,69,0.15); border: 1px solid var(--red); color: #ff6b7a; border-radius: var(--radius); padding: 0.6rem 0.85rem; font-size: 0.88rem; margin-top: 0.75rem; display: none; }
+    .error-msg.show { display: block; }
+
+    /* ---- APP SHELL ---- */
+    #app-shell { display: none; min-height: 100vh; flex-direction: column; }
+    #app-shell.active { display: flex; }
+
+    header {
+      background: var(--navy-light);
+      border-bottom: 1px solid var(--border);
+      padding: 0 1.5rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-brand { font-size: 1.1rem; font-weight: 700; color: var(--red); }
+    .header-brand span { color: var(--text-muted); font-weight: 400; font-size: 0.85rem; margin-left: 0.5rem; }
+    .header-right { display: flex; align-items: center; gap: 1rem; }
+    .rep-name { font-size: 0.88rem; color: var(--text-muted); }
+
+    /* ---- TABS ---- */
+    .tabs-bar {
+      background: var(--navy-light);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs-bar::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      padding: 1rem 1.4rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .tab-btn.active { color: var(--text); border-bottom-color: var(--red); }
+    .tab-btn:hover:not(.active) { color: var(--text); }
+
+    .tab-content { display: none; padding: 1.5rem; }
+    .tab-content.active { display: block; }
+
+    /* ---- STAT CARDS ---- */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.2rem 1.25rem;
+    }
+    .stat-card .label { font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+    .stat-card .value { font-size: 1.8rem; font-weight: 700; color: var(--text); line-height: 1; }
+    .stat-card .sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem; }
+
+    /* ---- SECTION HEADERS ---- */
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .section-title { font-size: 1rem; font-weight: 600; color: var(--text); }
+
+    /* ---- QUEUE ITEMS ---- */
+    .queue-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .queue-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+    }
+    .queue-item-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .queue-item-info h3 { font-size: 0.97rem; font-weight: 600; margin-bottom: 0.2rem; }
+    .queue-item-info p { font-size: 0.82rem; color: var(--text-muted); }
+    .queue-item-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+    .call-log-form {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    .call-log-form .full { grid-column: 1 / -1; }
+    .call-log-form .actions { grid-column: 1 / -1; display: flex; gap: 0.5rem; }
+
+    /* ---- BADGES ---- */
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .badge-red { background: rgba(220,53,69,0.2); color: #ff6b7a; }
+    .badge-green { background: rgba(34,197,94,0.15); color: #4ade80; }
+    .badge-yellow { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .badge-blue { background: rgba(59,130,246,0.15); color: #60a5fa; }
+    .badge-gray { background: rgba(148,163,184,0.15); color: #94a3b8; }
+    .badge-purple { background: rgba(168,85,247,0.15); color: #c084fc; }
+    .badge-high { background: rgba(220,53,69,0.2); color: #ff6b7a; }
+    .badge-medium { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .badge-low { background: rgba(34,197,94,0.15); color: #4ade80; }
+
+    /* ---- PIPELINE TABLE ---- */
+    .pipeline-header { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .stage-chip {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.5rem 0.85rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .stage-chip strong { color: var(--text); display: block; font-size: 1.1rem; }
+    .pipeline-controls { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; }
+    .pipeline-controls input, .pipeline-controls select {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      padding: 0.55rem 0.85rem;
+      font-size: 0.88rem;
+      outline: none;
+    }
+    .pipeline-controls input { flex: 1; min-width: 180px; }
+    .pipeline-controls select { min-width: 150px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th {
+      text-align: left;
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--navy-light);
+    }
+    td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.025); }
+    .table-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+
+    /* ---- MODAL ---- */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 1.75rem;
+    }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+    .modal-title { font-size: 1.05rem; font-weight: 700; }
+    .modal-close { background: none; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; line-height: 1; }
+    .modal-close:hover { color: var(--text); }
+    .modal-footer { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.25rem; }
+
+    /* ---- ONBOARDING ---- */
+    .onboarding-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .doc-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .doc-item-info h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.2rem; }
+    .doc-item-info p { font-size: 0.8rem; color: var(--text-muted); }
+    .doc-signed { color: #4ade80; font-size: 0.82rem; font-weight: 600; display: flex; align-items: center; gap: 0.3rem; }
+
+    /* ---- COMMISSIONS ---- */
+    .commission-summary { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+
+    /* ---- PIPELINE KANBAN COUNTS ---- */
+    .stage-counts { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1rem; }
+
+    /* ---- LOADING ---- */
+    .loading-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: 0.95rem; }
+    .spinner {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--border);
+      border-top-color: var(--red);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-bottom: 0.75rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); }
+
+    /* ---- ALERT BANNER ---- */
+    .alert {
+      padding: 0.7rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.88rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .alert.show { display: block; }
+    .alert-success { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); color: #4ade80; }
+    .alert-error { background: rgba(220,53,69,0.15); border: 1px solid rgba(220,53,69,0.3); color: #ff6b7a; }
+
+    /* ---- PDF DOWNLOAD ---- */
+    .pdf-section {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .pdf-section h3 { font-size: 0.97rem; font-weight: 600; }
+    .pdf-section p { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 600px) {
+      .call-log-form { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      header { padding: 0 1rem; }
+      .tab-content { padding: 1rem; }
+      .modal { padding: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ======================== LOGIN ======================== -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="logo">
+      <h1>HomeServiceDirectory</h1>
+      <p>Sales Rep Portal</p>
+    </div>
+    <form id="login-form">
+      <div class="form-group">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" placeholder="rep@example.com" required />
+      </div>
+      <div class="form-group">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" required />
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" id="login-btn">Sign In</button>
+      <div class="error-msg" id="login-error"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ======================== APP SHELL ======================== -->
+<div id="app-shell">
+  <header>
+    <div class="header-brand">HomeServiceDirectory <span>Rep Portal</span></div>
+    <div class="header-right">
+      <span class="rep-name" id="rep-name-display"></span>
+      <button class="btn btn-sm btn-ghost" id="logout-btn">Logout</button>
+    </div>
+  </header>
+
+  <div class="tabs-bar">
+    <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+    <button class="tab-btn" data-tab="queue">Queue</button>
+    <button class="tab-btn" data-tab="pipeline">Pipeline</button>
+    <button class="tab-btn" data-tab="commissions">Commissions</button>
+    <button class="tab-btn" data-tab="onboarding">Onboarding</button>
+  </div>
+
+  <!-- ======= DASHBOARD TAB ======= -->
+  <div class="tab-content active" id="tab-dashboard">
+    <div id="dash-loading" class="loading-state">
+      <div class="spinner"></div><br>Loading dashboard...
+    </div>
+    <div id="dash-body" style="display:none">
+      <div class="stats-grid" id="stats-grid"></div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; flex-wrap:wrap;">
+        <div>
+          <div class="section-header">
+            <span class="section-title">Today's Queue</span>
+            <button class="btn btn-sm btn-secondary" onclick="switchTab('queue')">View All</button>
+          </div>
+          <div class="queue-list" id="dash-queue-list"></div>
+        </div>
+        <div>
+          <div class="section-header"><span class="section-title">Pipeline Breakdown</span></div>
+          <div class="stage-counts" id="dash-stage-counts"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= QUEUE TAB ======= -->
+  <div class="tab-content" id="tab-queue">
+    <div class="section-header">
+      <span class="section-title">Today's Call Queue</span>
+      <button class="btn btn-sm btn-secondary" id="rebuild-queue-btn">Rebuild Queue</button>
+    </div>
+    <div class="alert alert-success" id="queue-alert"></div>
+    <div id="queue-loading" class="loading-state"><div class="spinner"></div><br>Loading queue...</div>
+    <div class="queue-list" id="queue-list"></div>
+    <div class="empty-state" id="queue-empty" style="display:none">No calls in today's queue.</div>
+  </div>
+
+  <!-- ======= PIPELINE TAB ======= -->
+  <div class="tab-content" id="tab-pipeline">
+    <div class="section-header">
+      <span class="section-title">POC Pipeline</span>
+      <button class="btn btn-sm btn-primary" id="add-poc-btn">+ Add POC</button>
+    </div>
+    <div class="stage-counts" id="pipeline-stage-counts"></div>
+    <div class="pipeline-controls">
+      <input type="text" id="pipeline-search" placeholder="Search by name, city, phone..." />
+      <select id="pipeline-stage-filter">
+        <option value="">All Stages</option>
+        <option value="new_lead">New Lead</option>
+        <option value="contacted">Contacted</option>
+        <option value="pitched">Pitched</option>
+        <option value="follow_up">Follow Up</option>
+        <option value="converted">Converted</option>
+        <option value="not_interested">Not Interested</option>
+      </select>
+    </div>
+    <div id="pipeline-loading" class="loading-state"><div class="spinner"></div><br>Loading pipeline...</div>
+    <div class="table-card" id="pipeline-table-wrap" style="display:none">
+      <div class="table-wrap">
+        <table id="pipeline-table">
+          <thead>
+            <tr>
+              <th>Business</th>
+              <th>Contact</th>
+              <th>City / State</th>
+              <th>Stage</th>
+              <th>Priority</th>
+              <th>Next Followup</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="pipeline-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="empty-state" id="pipeline-empty" style="display:none">No POCs found.</div>
+  </div>
+
+  <!-- ======= COMMISSIONS TAB ======= -->
+  <div class="tab-content" id="tab-commissions">
+    <div class="section-header"><span class="section-title">Commission History</span></div>
+    <div id="comm-loading" class="loading-state"><div class="spinner"></div><br>Loading commissions...</div>
+    <div id="comm-body" style="display:none">
+      <div class="commission-summary" id="comm-summary"></div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Client</th>
+                <th>Plan</th>
+                <th>Gross</th>
+                <th>Rate</th>
+                <th>Amount</th>
+                <th>Vesting Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="comm-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= ONBOARDING TAB ======= -->
+  <div class="tab-content" id="tab-onboarding">
+    <div class="section-header"><span class="section-title">Rep Onboarding Checklist</span></div>
+    <div class="alert alert-success" id="onboard-alert"></div>
+    <div id="onboard-loading" class="loading-state"><div class="spinner"></div><br>Loading documents...</div>
+    <div id="onboard-body" style="display:none">
+      <div class="onboarding-list" id="onboarding-list"></div>
+      <div class="pdf-section">
+        <div>
+          <h3>Rep Packet PDF</h3>
+          <p>Download the full onboarding and commission PDF packet.</p>
+        </div>
+        <button class="btn btn-primary" id="download-pdf-btn">Download PDF Packet</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== ADD POC MODAL ======================== -->
+<div class="modal-overlay" id="add-poc-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Add New POC</span>
+      <button class="modal-close" data-close="add-poc-modal">&times;</button>
+    </div>
+    <form id="add-poc-form">
+      <div class="form-group"><label>Business Name *</label><input type="text" name="business_name" required /></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+        <div class="form-group"><label>Contact Name</label><input type="text" name="contact_name" /></div>
+        <div class="form-group"><label>Phone *</label><input type="tel" name="phone" required /></div>
+        <div class="form-group"><label>Email</label><input type="email" name="email" /></div>
+        <div class="form-group"><label>City</label><input type="text" name="city" /></div>
+        <div class="form-group"><label>State</label><input type="text" name="state" maxlength="2" placeholder="TX" /></div>
+        <div class="form-group">
+          <label>Pipeline Stage</label>
+          <select name="pipeline_stage">
+            <option value="new_lead">New Lead</option>
+            <option value="contacted">Contacted</option>
+            <option value="pitched">Pitched</option>
+            <option value="follow_up">Follow Up</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Priority</label>
+          <select name="priority">
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>Notes</label><textarea name="notes" rows="3"></textarea></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close="add-poc-modal">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="add-poc-submit-btn">Add POC</button>
+      </div>
+      <div class="error-msg" id="poc-form-error"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ======================== SIGN DOC MODAL ======================== -->
+<div class="modal-overlay" id="sign-doc-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="sign-doc-title">Sign Document</span>
+      <button class="modal-close" data-close="sign-doc-modal">&times;</button>
+    </div>
+    <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.6;" id="sign-doc-desc">
+      By signing, you confirm you have read, understand, and agree to the terms of this document.
+    </p>
+    <div style="margin:1.25rem 0; background:var(--navy-lighter); border-radius:var(--radius); padding:1rem; font-size:0.85rem; color:var(--text-muted); border:1px solid var(--border);">
+      This electronic signature is legally binding under the Electronic Signatures in Global and National Commerce Act (ESIGN).
+    </div>
+    <label style="display:flex; align-items:center; gap:0.6rem; cursor:pointer; font-size:0.9rem;">
+      <input type="checkbox" id="sign-agree-check" />
+      <span>I have read and agree to the terms of this document</span>
+    </label>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-close="sign-doc-modal">Cancel</button>
+      <button type="button" class="btn btn-primary" id="confirm-sign-btn">Sign Document</button>
+    </div>
+    <div class="error-msg" id="sign-error"></div>
+  </div>
+</div>
+
+<script src="/shared-layout.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // ── CONFIG ──────────────────────────────────────────────────────────────────
+  const API = {
+    login:       '/api/auth-login',
+    logout:      '/api/auth-logout',
+    session:     '/api/auth-session',
+    dashboard:   '/api/rep-dashboard',
+    pocList:     '/api/rep-poc-list',
+    pocSubmit:   '/api/rep-poc-submit',
+    pocUpdate:   '/api/rep-poc-update',
+    callLog:     '/api/rep-call-log',
+    queue:       '/api/rep-daily-queue',
+    legalSign:   '/api/rep-legal-sign',
+    commissions: '/api/rep-commissions',
+    pdfPacket:   '/api/pdf-packet',
+  };
+
+  let TOKEN = localStorage.getItem('rep_token') || null;
+  let ALL_POCS = [];
+  let ONBOARDING_DOCS = [];
+  let currentSignDoc = null;
+
+  // ── HELPERS ─────────────────────────────────────────────────────────────────
+  function authHeaders() {
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${TOKEN}`,
+    };
+  }
+
+  async function apiFetch(url, options = {}) {
+    const resp = await fetch(url, {
+      ...options,
+      headers: { ...authHeaders(), ...(options.headers || {}) },
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ error: resp.statusText }));
+      throw new Error(err.error || resp.statusText);
+    }
+    return resp.json();
+  }
+
+  function fmt(n) {
+    if (n == null) return '-';
+    return Number(n).toLocaleString('en-US');
+  }
+
+  function fmtMoney(n) {
+    if (n == null) return '-';
+    return '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function fmtDate(d) {
+    if (!d) return '-';
+    return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function stageLabel(s) {
+    return { new_lead: 'New Lead', contacted: 'Contacted', pitched: 'Pitched',
+      follow_up: 'Follow Up', converted: 'Converted', not_interested: 'Not Interested' }[s] || s;
+  }
+
+  function stageBadge(s) {
+    const map = { new_lead: 'gray', contacted: 'blue', pitched: 'yellow',
+      follow_up: 'purple', converted: 'green', not_interested: 'red' };
+    return `<span class="badge badge-${map[s] || 'gray'}">${stageLabel(s)}</span>`;
+  }
+
+  function commStatusBadge(s) {
+    const map = { pending: 'gray', vesting: 'yellow', earned: 'green', paid: 'blue', clawed_back: 'red' };
+    return `<span class="badge badge-${map[s] || 'gray'}">${s || '-'}</span>`;
+  }
+
+  function priorityBadge(p) {
+    return `<span class="badge badge-${p}">${p}</span>`;
+  }
+
+  function showAlert(id, msg, type = 'success') {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = `alert alert-${type} show`;
+    el.textContent = msg;
+    setTimeout(() => { el.classList.remove('show'); }, 4000);
+  }
+
+  // ── MODAL ───────────────────────────────────────────────────────────────────
+  function openModal(id) { document.getElementById(id).classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  document.querySelectorAll('[data-close]').forEach(btn => {
+    btn.addEventListener('click', () => closeModal(btn.dataset.close));
+  });
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.classList.remove('open');
+    });
+  });
+
+  // ── TABS ────────────────────────────────────────────────────────────────────
+  function switchTab(name) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === `tab-${name}`));
+    if (name === 'queue') loadQueue();
+    if (name === 'pipeline') loadPipeline();
+    if (name === 'commissions') loadCommissions();
+    if (name === 'onboarding') loadOnboarding();
+  }
+
+  window.switchTab = switchTab;
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+
+  // ── LOGIN ───────────────────────────────────────────────────────────────────
+  document.getElementById('login-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = document.getElementById('login-btn');
+    const err = document.getElementById('login-error');
+    btn.disabled = true;
+    btn.textContent = 'Signing in...';
+    err.classList.remove('show');
+    try {
+      const data = await fetch(API.login, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: document.getElementById('login-email').value,
+          password: document.getElementById('login-password').value,
+          role: 'rep',
+        }),
+      }).then(r => r.json());
+      if (!data.token) throw new Error(data.error || 'Login failed');
+      TOKEN = data.token;
+      localStorage.setItem('rep_token', TOKEN);
+      startApp(data.user);
+    } catch (ex) {
+      err.textContent = ex.message;
+      err.classList.add('show');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+    }
+  });
+
+  // ── LOGOUT ──────────────────────────────────────────────────────────────────
+  document.getElementById('logout-btn').addEventListener('click', async () => {
+    await fetch(API.logout, { method: 'POST', headers: authHeaders() }).catch(() => {});
+    TOKEN = null;
+    localStorage.removeItem('rep_token');
+    document.getElementById('app-shell').classList.remove('active');
+    document.getElementById('login-screen').style.display = 'flex';
+    switchTab('dashboard');
+  });
+
+  // ── START APP ───────────────────────────────────────────────────────────────
+  function startApp(user) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-shell').classList.add('active');
+    if (user) document.getElementById('rep-name-display').textContent = user.name || user.email || '';
+    loadDashboard();
+  }
+
+  // ── CHECK SESSION ────────────────────────────────────────────────────────────
+  async function checkSession() {
+    if (!TOKEN) return;
+    try {
+      const data = await apiFetch(API.session);
+      if (data.user) startApp(data.user);
+    } catch {
+      TOKEN = null;
+      localStorage.removeItem('rep_token');
+    }
+  }
+
+  // ── DASHBOARD ───────────────────────────────────────────────────────────────
+  async function loadDashboard() {
+    document.getElementById('dash-loading').style.display = 'block';
+    document.getElementById('dash-body').style.display = 'none';
+    try {
+      const data = await apiFetch(API.dashboard);
+      renderDashboard(data);
+    } catch (ex) {
+      document.getElementById('dash-loading').innerHTML = `<div style="color:#ff6b7a">Failed to load: ${ex.message}</div>`;
+    }
+  }
+
+  function renderDashboard(data) {
+    document.getElementById('dash-loading').style.display = 'none';
+    document.getElementById('dash-body').style.display = 'block';
+
+    const stats = data.stats || {};
+    document.getElementById('stats-grid').innerHTML = `
+      <div class="stat-card">
+        <div class="label">Active Clients</div>
+        <div class="value">${fmt(stats.active_clients)}</div>
+        <div class="sub">paying subscribers</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">My MRR</div>
+        <div class="value">${fmtMoney(stats.mrr)}</div>
+        <div class="sub">monthly recurring</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Commission Tier</div>
+        <div class="value">${stats.commission_tier || '-'}%</div>
+        <div class="sub">current rate</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Est. Monthly Earnings</div>
+        <div class="value">${fmtMoney(stats.monthly_earnings_estimate)}</div>
+        <div class="sub">before vesting</div>
+      </div>
+    `;
+
+    // Quick queue preview (first 4)
+    const queue = data.queue || [];
+    const queueList = document.getElementById('dash-queue-list');
+    if (!queue.length) {
+      queueList.innerHTML = '<div class="empty-state" style="padding:1rem">No calls in queue.</div>';
+    } else {
+      queueList.innerHTML = queue.slice(0, 4).map(item => `
+        <div class="queue-item">
+          <div class="queue-item-top">
+            <div class="queue-item-info">
+              <h3>${esc(item.business_name)}</h3>
+              <p>${esc(item.phone || '')} &bull; ${esc(item.city || '')}${item.state ? ', ' + item.state : ''}</p>
+            </div>
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+              ${stageBadge(item.pipeline_stage)}
+              ${priorityBadge(item.priority || 'medium')}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Stage counts
+    const counts = data.stage_counts || {};
+    document.getElementById('dash-stage-counts').innerHTML = Object.entries(counts).map(([s, n]) => `
+      <div class="stage-chip"><strong>${n}</strong>${stageLabel(s)}</div>
+    `).join('');
+  }
+
+  // ── QUEUE ───────────────────────────────────────────────────────────────────
+  async function loadQueue() {
+    document.getElementById('queue-loading').style.display = 'block';
+    document.getElementById('queue-list').innerHTML = '';
+    document.getElementById('queue-empty').style.display = 'none';
+    try {
+      const data = await apiFetch(API.queue);
+      renderQueue(data.queue || data || []);
+    } catch (ex) {
+      document.getElementById('queue-loading').innerHTML = `<div style="color:#ff6b7a">Failed: ${ex.message}</div>`;
+    }
+  }
+
+  function renderQueue(items) {
+    document.getElementById('queue-loading').style.display = 'none';
+    const list = document.getElementById('queue-list');
+    if (!items.length) {
+      document.getElementById('queue-empty').style.display = 'block';
+      return;
+    }
+    list.innerHTML = items.map((item, idx) => `
+      <div class="queue-item" id="qitem-${idx}">
+        <div class="queue-item-top">
+          <div class="queue-item-info">
+            <h3>${esc(item.business_name)}</h3>
+            <p>${esc(item.phone || '-')} &bull; ${esc(item.city || '')}${item.state ? ', ' + item.state : ''}</p>
+          </div>
+          <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+            ${stageBadge(item.pipeline_stage)}
+            ${priorityBadge(item.priority || 'medium')}
+            <div class="queue-item-actions">
+              <button class="btn btn-sm btn-primary" onclick="toggleCallForm(${idx}, '${item.poc_id}')">Log Call</button>
+              <button class="btn btn-sm btn-ghost" onclick="skipQueueItem(${idx})">Skip</button>
+            </div>
+          </div>
+        </div>
+        <div class="call-log-form" id="call-form-${idx}" style="display:none">
+          <div class="form-group">
+            <label>Outcome</label>
+            <select id="outcome-${idx}">
+              <option value="answered">Answered</option>
+              <option value="voicemail">Voicemail</option>
+              <option value="no_answer">No Answer</option>
+              <option value="callback_scheduled">Callback Scheduled</option>
+              <option value="not_interested">Not Interested</option>
+              <option value="converted">Converted</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Duration (seconds)</label>
+            <input type="number" id="duration-${idx}" placeholder="0" min="0" />
+          </div>
+          <div class="form-group full">
+            <label>Notes</label>
+            <textarea id="notes-${idx}" rows="2" placeholder="Call notes..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Next Action</label>
+            <input type="text" id="next-action-${idx}" placeholder="e.g. Send proposal" />
+          </div>
+          <div class="form-group">
+            <label>Next Followup</label>
+            <input type="datetime-local" id="next-at-${idx}" />
+          </div>
+          <div class="actions">
+            <button class="btn btn-sm btn-primary" onclick="submitCallLog(${idx}, '${item.poc_id}')">Save Log</button>
+            <button class="btn btn-sm btn-ghost" onclick="toggleCallForm(${idx}, '${item.poc_id}')">Cancel</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  window.toggleCallForm = function(idx, pocId) {
+    const f = document.getElementById(`call-form-${idx}`);
+    f.style.display = f.style.display === 'none' ? 'grid' : 'none';
+  };
+
+  window.skipQueueItem = function(idx) {
+    const el = document.getElementById(`qitem-${idx}`);
+    if (el) { el.style.opacity = '0.4'; el.style.pointerEvents = 'none'; }
+  };
+
+  window.submitCallLog = async function(idx, pocId) {
+    const btn = document.querySelector(`#qitem-${idx} .actions .btn-primary`);
+    if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+    try {
+      await apiFetch(API.callLog, {
+        method: 'POST',
+        body: JSON.stringify({
+          poc_id: pocId,
+          outcome: document.getElementById(`outcome-${idx}`).value,
+          duration_seconds: parseInt(document.getElementById(`duration-${idx}`).value) || 0,
+          notes: document.getElementById(`notes-${idx}`).value,
+          next_action: document.getElementById(`next-action-${idx}`).value,
+          next_action_at: document.getElementById(`next-at-${idx}`).value || null,
+        }),
+      });
+      showAlert('queue-alert', 'Call logged successfully.');
+      skipQueueItem(idx);
+    } catch (ex) {
+      alert('Failed to save: ' + ex.message);
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = 'Save Log'; }
+    }
+  };
+
+  document.getElementById('rebuild-queue-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('rebuild-queue-btn');
+    btn.disabled = true; btn.textContent = 'Building...';
+    try {
+      await apiFetch(API.queue, { method: 'POST' });
+      showAlert('queue-alert', 'Queue rebuilt.');
+      await loadQueue();
+    } catch (ex) {
+      showAlert('queue-alert', ex.message, 'error');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Rebuild Queue';
+    }
+  });
+
+  // ── PIPELINE ─────────────────────────────────────────────────────────────────
+  async function loadPipeline() {
+    document.getElementById('pipeline-loading').style.display = 'block';
+    document.getElementById('pipeline-table-wrap').style.display = 'none';
+    document.getElementById('pipeline-empty').style.display = 'none';
+    try {
+      const stage = document.getElementById('pipeline-stage-filter').value;
+      const params = stage ? `?stage=${stage}` : '';
+      const data = await apiFetch(API.pocList + params);
+      ALL_POCS = data.pocs || data || [];
+      renderPipeline(ALL_POCS);
+    } catch (ex) {
+      document.getElementById('pipeline-loading').innerHTML = `<div style="color:#ff6b7a">Failed: ${ex.message}</div>`;
+    }
+  }
+
+  function renderPipeline(pocs) {
+    document.getElementById('pipeline-loading').style.display = 'none';
+
+    // Stage counts
+    const counts = {};
+    pocs.forEach(p => { counts[p.pipeline_stage] = (counts[p.pipeline_stage] || 0) + 1; });
+    document.getElementById('pipeline-stage-counts').innerHTML = Object.entries(counts).map(([s, n]) => `
+      <div class="stage-chip"><strong>${n}</strong>${stageLabel(s)}</div>
+    `).join('');
+
+    if (!pocs.length) {
+      document.getElementById('pipeline-empty').style.display = 'block';
+      return;
+    }
+
+    document.getElementById('pipeline-table-wrap').style.display = 'block';
+    document.getElementById('pipeline-tbody').innerHTML = pocs.map(p => `
+      <tr>
+        <td><strong>${esc(p.business_name)}</strong></td>
+        <td>${esc(p.contact_name || '')} ${p.email ? `<br><span style="color:var(--text-muted);font-size:0.78rem">${esc(p.email)}</span>` : ''}</td>
+        <td>${esc(p.city || '')}${p.state ? ', ' + p.state : ''}</td>
+        <td>${stageBadge(p.pipeline_stage)}</td>
+        <td>${priorityBadge(p.priority || 'medium')}</td>
+        <td style="font-size:0.82rem;color:var(--text-muted)">${fmtDate(p.next_followup_at)}</td>
+        <td>
+          <select class="stage-select" style="background:var(--navy-lighter);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:0.25rem 0.4rem;font-size:0.8rem;" onchange="updatePocStage('${p.poc_id}', this.value)">
+            <option value="new_lead" ${p.pipeline_stage === 'new_lead' ? 'selected' : ''}>New Lead</option>
+            <option value="contacted" ${p.pipeline_stage === 'contacted' ? 'selected' : ''}>Contacted</option>
+            <option value="pitched" ${p.pipeline_stage === 'pitched' ? 'selected' : ''}>Pitched</option>
+            <option value="follow_up" ${p.pipeline_stage === 'follow_up' ? 'selected' : ''}>Follow Up</option>
+            <option value="converted" ${p.pipeline_stage === 'converted' ? 'selected' : ''}>Converted</option>
+            <option value="not_interested" ${p.pipeline_stage === 'not_interested' ? 'selected' : ''}>Not Interested</option>
+          </select>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  window.updatePocStage = async function(pocId, stage) {
+    try {
+      await apiFetch(API.pocUpdate, {
+        method: 'PATCH',
+        body: JSON.stringify({ poc_id: pocId, pipeline_stage: stage }),
+      });
+    } catch (ex) {
+      alert('Failed to update: ' + ex.message);
+    }
+  };
+
+  // Search + filter
+  document.getElementById('pipeline-search').addEventListener('input', filterPipeline);
+  document.getElementById('pipeline-stage-filter').addEventListener('change', () => loadPipeline());
+
+  function filterPipeline() {
+    const q = document.getElementById('pipeline-search').value.toLowerCase();
+    const filtered = q
+      ? ALL_POCS.filter(p =>
+          (p.business_name || '').toLowerCase().includes(q) ||
+          (p.city || '').toLowerCase().includes(q) ||
+          (p.phone || '').includes(q))
+      : ALL_POCS;
+    renderPipeline(filtered);
+  }
+
+  // Add POC
+  document.getElementById('add-poc-btn').addEventListener('click', () => {
+    document.getElementById('add-poc-form').reset();
+    document.getElementById('poc-form-error').classList.remove('show');
+    openModal('add-poc-modal');
+  });
+
+  document.getElementById('add-poc-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = document.getElementById('add-poc-submit-btn');
+    const err = document.getElementById('poc-form-error');
+    btn.disabled = true; btn.textContent = 'Adding...';
+    err.classList.remove('show');
+    const fd = new FormData(e.target);
+    const body = {};
+    fd.forEach((v, k) => { if (v) body[k] = v; });
+    try {
+      await apiFetch(API.pocSubmit, { method: 'POST', body: JSON.stringify(body) });
+      closeModal('add-poc-modal');
+      await loadPipeline();
+    } catch (ex) {
+      err.textContent = ex.message;
+      err.classList.add('show');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Add POC';
+    }
+  });
+
+  // ── COMMISSIONS ──────────────────────────────────────────────────────────────
+  async function loadCommissions() {
+    document.getElementById('comm-loading').style.display = 'block';
+    document.getElementById('comm-body').style.display = 'none';
+    try {
+      const data = await apiFetch(API.commissions);
+      renderCommissions(data);
+    } catch (ex) {
+      document.getElementById('comm-loading').innerHTML = `<div style="color:#ff6b7a">Failed: ${ex.message}</div>`;
+    }
+  }
+
+  function renderCommissions(data) {
+    document.getElementById('comm-loading').style.display = 'none';
+    document.getElementById('comm-body').style.display = 'block';
+
+    const summary = data.summary || {};
+    document.getElementById('comm-summary').innerHTML = `
+      <div class="stat-card"><div class="label">Total Earned</div><div class="value" style="font-size:1.4rem">${fmtMoney(summary.total_earned)}</div></div>
+      <div class="stat-card"><div class="label">Vesting</div><div class="value" style="font-size:1.4rem">${fmtMoney(summary.total_vesting)}</div></div>
+      <div class="stat-card"><div class="label">Paid Out</div><div class="value" style="font-size:1.4rem">${fmtMoney(summary.total_paid)}</div></div>
+      <div class="stat-card"><div class="label">Pending</div><div class="value" style="font-size:1.4rem">${fmtMoney(summary.total_pending)}</div></div>
+    `;
+
+    const rows = data.commissions || [];
+    document.getElementById('comm-tbody').innerHTML = rows.length
+      ? rows.map(r => `
+        <tr>
+          <td>${esc(r.client_name || '-')}</td>
+          <td><span style="font-size:0.8rem;color:var(--text-muted)">${esc(r.plan || '-')}</span></td>
+          <td>${fmtMoney(r.gross)}</td>
+          <td>${r.pct != null ? r.pct + '%' : '-'}</td>
+          <td style="font-weight:600">${fmtMoney(r.amount)}</td>
+          <td style="font-size:0.82rem;color:var(--text-muted)">${fmtDate(r.vesting_date)}</td>
+          <td>${commStatusBadge(r.status)}</td>
+        </tr>
+      `).join('')
+      : '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:2rem">No commission records yet.</td></tr>';
+  }
+
+  // ── ONBOARDING ───────────────────────────────────────────────────────────────
+  const REQUIRED_DOCS = [
+    { doc_type: 'independent_contractor_agreement', label: 'Independent Contractor Agreement', desc: 'Your employment classification and working relationship terms.' },
+    { doc_type: 'commission_schedule', label: 'Commission Schedule', desc: 'Tier structure, rates (30-50%), and vesting periods.' },
+    { doc_type: 'claw_back_policy', label: 'Claw-Back Policy', desc: 'Terms for commission recovery on early cancellations.' },
+    { doc_type: 'confidentiality_agreement', label: 'Confidentiality / NDA', desc: 'Protection of company and client data.' },
+    { doc_type: 'code_of_conduct', label: 'Code of Conduct', desc: 'Ethical sales practices and professional standards.' },
+    { doc_type: 'data_privacy_policy', label: 'Data Privacy Policy', desc: 'How you handle prospect and client information.' },
+    { doc_type: 'territory_agreement', label: 'Territory Agreement', desc: 'Your assigned geographic sales territory.' },
+    { doc_type: 'acceptable_use_policy', label: 'Acceptable Use Policy', desc: 'Use of company systems, tools, and resources.' },
+    { doc_type: 'payment_terms', label: 'Payment Terms', desc: 'Payment schedule, method, and net terms.' },
+    { doc_type: 'dispute_resolution', label: 'Dispute Resolution Agreement', desc: 'Process for resolving any compensation or employment disputes.' },
+  ];
+
+  async function loadOnboarding() {
+    document.getElementById('onboard-loading').style.display = 'block';
+    document.getElementById('onboard-body').style.display = 'none';
+    try {
+      const data = await apiFetch(API.legalSign);
+      const signed = new Set((data.signed || []).map(d => d.doc_type));
+      ONBOARDING_DOCS = REQUIRED_DOCS.map(d => ({ ...d, signed: signed.has(d.doc_type) }));
+      renderOnboarding();
+    } catch (ex) {
+      document.getElementById('onboard-loading').innerHTML = `<div style="color:#ff6b7a">Failed: ${ex.message}</div>`;
+    }
+  }
+
+  function renderOnboarding() {
+    document.getElementById('onboard-loading').style.display = 'none';
+    document.getElementById('onboard-body').style.display = 'block';
+
+    const signedCount = ONBOARDING_DOCS.filter(d => d.signed).length;
+    const pct = Math.round((signedCount / ONBOARDING_DOCS.length) * 100);
+
+    document.getElementById('onboarding-list').innerHTML = `
+      <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:0.25rem;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;font-size:0.88rem;">
+          <span>Progress</span><span style="color:var(--text-muted)">${signedCount} / ${ONBOARDING_DOCS.length} signed</span>
+        </div>
+        <div style="background:var(--border);border-radius:999px;height:6px;">
+          <div style="background:var(--red);border-radius:999px;height:6px;width:${pct}%;transition:width 0.4s"></div>
+        </div>
+      </div>
+      ${ONBOARDING_DOCS.map((doc, idx) => `
+        <div class="doc-item">
+          <div class="doc-item-info">
+            <h4>${esc(doc.label)}</h4>
+            <p>${esc(doc.desc)}</p>
+          </div>
+          <div>
+            ${doc.signed
+              ? '<span class="doc-signed">&#10003; Signed</span>'
+              : `<button class="btn btn-sm btn-primary" onclick="openSignModal(${idx})">Sign</button>`
+            }
+          </div>
+        </div>
+      `).join('')}
+    `;
+  }
+
+  window.openSignModal = function(idx) {
+    currentSignDoc = idx;
+    const doc = ONBOARDING_DOCS[idx];
+    document.getElementById('sign-doc-title').textContent = doc.label;
+    document.getElementById('sign-agree-check').checked = false;
+    document.getElementById('sign-error').classList.remove('show');
+    openModal('sign-doc-modal');
+  };
+
+  document.getElementById('confirm-sign-btn').addEventListener('click', async () => {
+    const agreed = document.getElementById('sign-agree-check').checked;
+    const errEl = document.getElementById('sign-error');
+    if (!agreed) {
+      errEl.textContent = 'You must check the agreement box to sign.';
+      errEl.classList.add('show');
+      return;
+    }
+    const doc = ONBOARDING_DOCS[currentSignDoc];
+    const btn = document.getElementById('confirm-sign-btn');
+    btn.disabled = true; btn.textContent = 'Signing...';
+    errEl.classList.remove('show');
+    try {
+      await apiFetch(API.legalSign, {
+        method: 'POST',
+        body: JSON.stringify({ doc_type: doc.doc_type, agreed: true }),
+      });
+      ONBOARDING_DOCS[currentSignDoc].signed = true;
+      closeModal('sign-doc-modal');
+      renderOnboarding();
+      showAlert('onboard-alert', `"${doc.label}" signed successfully.`);
+    } catch (ex) {
+      errEl.textContent = ex.message;
+      errEl.classList.add('show');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Sign Document';
+    }
+  });
+
+  document.getElementById('download-pdf-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('download-pdf-btn');
+    btn.disabled = true; btn.textContent = 'Preparing...';
+    try {
+      const resp = await fetch(API.pdfPacket, { headers: authHeaders() });
+      if (!resp.ok) throw new Error('Download failed');
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'rep-packet.pdf'; a.click();
+      URL.revokeObjectURL(url);
+    } catch (ex) {
+      alert('Could not download PDF: ' + ex.message);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Download PDF Packet';
+    }
+  });
+
+  // ── XSS ESCAPE ───────────────────────────────────────────────────────────────
+  function esc(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── INIT ────────────────────────────────────────────────────────────────────
+  checkSession();
+})();
+</script>
+</body>
+</html>

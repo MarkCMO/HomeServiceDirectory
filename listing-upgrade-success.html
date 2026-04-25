@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upgrade Successful | HomeServiceDirectory</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared.css">
+</head>
+<body>
+  <section class="directory-hero" style="padding:120px 0 60px;text-align:center;">
+    <div class="container">
+      <div style="font-size:4rem;margin-bottom:16px;">&#x1F389;</div>
+      <h1>Upgrade <span style="color:var(--green);">Successful!</span></h1>
+      <p>Your listing has been upgraded. You'll start receiving exclusive leads.</p>
+    </div>
+  </section>
+  <section class="section" style="padding-top:20px;">
+    <div class="container" style="max-width:500px;text-align:center;">
+      <div style="background:var(--white);border-radius:var(--radius-lg);padding:32px;border:1px solid var(--light-gray);">
+        <p id="planInfo" style="font-size:1.1rem;font-weight:600;margin-bottom:16px;"></p>
+        <p style="color:var(--dark-gray);margin-bottom:24px;">Exclusive homeowner leads will now be sent directly to your email. Check your dashboard to manage leads and track performance.</p>
+        <a id="dashLink" href="/my-listing" class="btn btn-primary" style="width:100%;justify-content:center;">Go to Dashboard</a>
+      </div>
+    </div>
+  </section>
+  <script src="/shared-layout.js"></script>
+  <script>
+    var params = new URLSearchParams(window.location.search);
+    var plan = params.get('plan') || '';
+    var slug = params.get('slug') || '';
+    var planNames = { pro: 'Pro ($149/mo)', premium: 'Premium ($299/mo)', elite: 'Elite ($499/mo)', sponsor: 'City Sponsor ($799/mo)' };
+    document.getElementById('planInfo').textContent = 'Plan: ' + (planNames[plan] || plan.toUpperCase());
+    if (slug) document.getElementById('dashLink').href = '/my-listing?slug=' + slug;
+  </script>
+</body>
+</html>

@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manager Portal - HomeServiceDirectory</title>
+  <link rel="stylesheet" href="/shared.css" />
+  <style>
+    :root {
+      --red: #DC3545;
+      --red-dark: #b02a37;
+      --navy: #1a1f36;
+      --navy-light: #252b47;
+      --navy-lighter: #2f3659;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --border: #374162;
+      --card-bg: #252b47;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --info: #3b82f6;
+      --radius: 8px;
+      --gold: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ---- LOGIN ---- */
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--navy);
+      padding: 1rem;
+    }
+    .login-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 400px;
+    }
+    .login-card .logo { text-align: center; margin-bottom: 1.75rem; }
+    .login-card .logo h1 { font-size: 1.4rem; color: var(--red); font-weight: 700; }
+    .login-card .logo p { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      background: var(--navy-lighter);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      padding: 0.6rem 0.85rem;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--red); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-primary { background: var(--red); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--red-dark); }
+    .btn-secondary { background: var(--navy-lighter); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover:not(:disabled) { background: var(--border); }
+    .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.8rem; }
+    .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+    .btn-ghost:hover:not(:disabled) { background: var(--navy-lighter); color: var(--text); }
+    .btn-full { width: 100%; justify-content: center; }
+
+    .error-msg { background: rgba(220,53,69,0.15); border: 1px solid var(--red); color: #ff6b7a; border-radius: var(--radius); padding: 0.6rem 0.85rem; font-size: 0.88rem; margin-top: 0.75rem; display: none; }
+    .error-msg.show { display: block; }
+
+    /* ---- APP ---- */
+    #app-shell { display: none; min-height: 100vh; flex-direction: column; }
+    #app-shell.active { display: flex; }
+
+    header {
+      background: var(--navy-light);
+      border-bottom: 2px solid var(--red);
+      padding: 0 1.5rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-brand { font-size: 1.1rem; font-weight: 700; }
+    .header-brand .site { color: var(--red); }
+    .header-brand .role-pill {
+      background: rgba(220,53,69,0.15);
+      color: var(--red);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      letter-spacing: 0.06em;
+      margin-left: 0.6rem;
+      text-transform: uppercase;
+    }
+    .header-right { display: flex; align-items: center; gap: 1rem; }
+    .manager-name { font-size: 0.88rem; color: var(--text-muted); }
+
+    /* ---- TABS ---- */
+    .tabs-bar {
+      background: var(--navy-light);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs-bar::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      padding: 1rem 1.4rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .tab-btn.active { color: var(--text); border-bottom-color: var(--red); }
+    .tab-btn:hover:not(.active) { color: var(--text); }
+
+    .tab-content { display: none; padding: 1.5rem; }
+    .tab-content.active { display: block; }
+
+    /* ---- STAT CARDS ---- */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.2rem 1.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--red);
+    }
+    .stat-card .label { font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+    .stat-card .value { font-size: 1.75rem; font-weight: 700; line-height: 1; }
+    .stat-card .sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem; }
+    .stat-card.accent::before { background: var(--gold); }
+    .stat-card.accent .value { color: #fbbf24; }
+
+    /* ---- SECTION ---- */
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .section-title { font-size: 1rem; font-weight: 600; }
+
+    /* ---- TABLE ---- */
+    .table-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th {
+      text-align: left;
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--navy-light);
+      white-space: nowrap;
+    }
+    td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.025); }
+
+    /* ---- BADGES ---- */
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .badge-green { background: rgba(34,197,94,0.15); color: #4ade80; }
+    .badge-yellow { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .badge-blue { background: rgba(59,130,246,0.15); color: #60a5fa; }
+    .badge-gray { background: rgba(148,163,184,0.15); color: #94a3b8; }
+    .badge-red { background: rgba(220,53,69,0.2); color: #ff6b7a; }
+    .badge-purple { background: rgba(168,85,247,0.15); color: #c084fc; }
+
+    /* ---- LOADING ---- */
+    .loading-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: 0.95rem; }
+    .spinner {
+      display: inline-block;
+      width: 26px;
+      height: 26px;
+      border: 3px solid var(--border);
+      border-top-color: var(--red);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-bottom: 0.75rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); }
+
+    .alert {
+      padding: 0.7rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.88rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .alert.show { display: block; }
+    .alert-success { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); color: #4ade80; }
+    .alert-error { background: rgba(220,53,69,0.15); border: 1px solid rgba(220,53,69,0.3); color: #ff6b7a; }
+
+    /* ---- LEADERBOARD ---- */
+    .leaderboard-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .lb-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .lb-rank {
+      font-size: 1.3rem;
+      font-weight: 700;
+      width: 2.2rem;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .lb-rank.r1 { color: #f59e0b; }
+    .lb-rank.r2 { color: #94a3b8; }
+    .lb-rank.r3 { color: #cd7f32; }
+    .lb-info { flex: 1; }
+    .lb-info h3 { font-size: 0.97rem; font-weight: 600; margin-bottom: 0.15rem; }
+    .lb-info p { font-size: 0.82rem; color: var(--text-muted); }
+    .lb-mrr { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+    .lb-bar-wrap { flex: 1; max-width: 200px; background: var(--border); border-radius: 999px; height: 6px; }
+    .lb-bar { background: var(--red); height: 6px; border-radius: 999px; transition: width 0.4s; }
+
+    /* ---- RECENT WINS ---- */
+    .wins-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .win-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-left: 3px solid #4ade80;
+      border-radius: var(--radius);
+      padding: 0.85rem 1.1rem;
+    }
+    .win-item h4 { font-size: 0.9rem; font-weight: 600; }
+    .win-item p { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; }
+
+    /* ---- OVERRIDE HISTORY ---- */
+    .override-summary { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+
+    /* ---- INLINE SELECT ---- */
+    .inline-select {
+      background: var(--navy-lighter);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      padding: 0.28rem 0.5rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .inline-select:focus { outline: none; border-color: var(--red); }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .tab-content { padding: 1rem; }
+      header { padding: 0 1rem; }
+      .lb-bar-wrap { display: none; }
+    }
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ======================== LOGIN ======================== -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="logo">
+      <h1>HomeServiceDirectory</h1>
+      <p>Manager Portal</p>
+    </div>
+    <form id="login-form">
+      <div class="form-group">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" placeholder="manager@example.com" required />
+      </div>
+      <div class="form-group">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" required />
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" id="login-btn">Sign In</button>
+      <div class="error-msg" id="login-error"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ======================== APP SHELL ======================== -->
+<div id="app-shell">
+  <header>
+    <div class="header-brand">
+      <span class="site">HomeServiceDirectory</span>
+      <span class="role-pill">Manager</span>
+    </div>
+    <div class="header-right">
+      <span class="manager-name" id="manager-name-display"></span>
+      <button class="btn btn-sm btn-ghost" id="logout-btn">Logout</button>
+    </div>
+  </header>
+
+  <div class="tabs-bar">
+    <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+    <button class="tab-btn" data-tab="team">Team</button>
+    <button class="tab-btn" data-tab="leaderboard">Leaderboard</button>
+    <button class="tab-btn" data-tab="overrides">Overrides</button>
+  </div>
+
+  <!-- ======= DASHBOARD TAB ======= -->
+  <div class="tab-content active" id="tab-dashboard">
+    <div id="dash-loading" class="loading-state"><div class="spinner"></div><br>Loading dashboard...</div>
+    <div id="dash-body" style="display:none">
+      <div class="stats-grid" id="stats-grid"></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; flex-wrap:wrap;" class="dash-lower">
+        <div>
+          <div class="section-header"><span class="section-title">Recent Team Wins</span></div>
+          <div class="wins-list" id="wins-list"></div>
+        </div>
+        <div>
+          <div class="section-header">
+            <span class="section-title">Top Reps Today</span>
+            <button class="btn btn-sm btn-secondary" onclick="switchTab('leaderboard')">Full Board</button>
+          </div>
+          <div class="leaderboard-list" id="dash-leaderboard"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= TEAM TAB ======= -->
+  <div class="tab-content" id="tab-team">
+    <div class="section-header">
+      <span class="section-title">My Team</span>
+      <span id="team-rep-count" style="font-size:0.85rem; color:var(--text-muted)"></span>
+    </div>
+    <div class="alert alert-success" id="team-alert"></div>
+    <div id="team-loading" class="loading-state"><div class="spinner"></div><br>Loading team...</div>
+    <div class="table-card" id="team-table-wrap" style="display:none">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Rep</th>
+              <th>Status</th>
+              <th>Tier</th>
+              <th>Active Clients</th>
+              <th>MRR</th>
+              <th>Commission Est.</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="team-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="empty-state" id="team-empty" style="display:none">No reps assigned to your team.</div>
+  </div>
+
+  <!-- ======= LEADERBOARD TAB ======= -->
+  <div class="tab-content" id="tab-leaderboard">
+    <div class="section-header">
+      <span class="section-title">Team Leaderboard</span>
+      <span style="font-size:0.82rem;color:var(--text-muted)">Ranked by MRR</span>
+    </div>
+    <div id="lb-loading" class="loading-state"><div class="spinner"></div><br>Loading leaderboard...</div>
+    <div class="leaderboard-list" id="leaderboard-list"></div>
+    <div class="empty-state" id="lb-empty" style="display:none">No leaderboard data available.</div>
+  </div>
+
+  <!-- ======= OVERRIDES TAB ======= -->
+  <div class="tab-content" id="tab-overrides">
+    <div class="section-header"><span class="section-title">My Override Earnings</span></div>
+    <div id="override-loading" class="loading-state"><div class="spinner"></div><br>Loading override history...</div>
+    <div id="override-body" style="display:none">
+      <div class="override-summary" id="override-summary"></div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Rep</th>
+                <th>Client</th>
+                <th>Plan</th>
+                <th>Rep Commission</th>
+                <th>Override %</th>
+                <th>Override Amount</th>
+                <th>Period</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="override-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/shared-layout.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // ── CONFIG ──────────────────────────────────────────────────────────────────
+  const API = {
+    login:         '/api/auth-login',
+    logout:        '/api/auth-logout',
+    session:       '/api/auth-session',
+    dashboard:     '/api/manager-dashboard',
+    repUpdate:     '/api/manager-rep-update',
+  };
+
+  let TOKEN = localStorage.getItem('mgr_token') || null;
+  let TEAM_REPS = [];
+  let LEADERBOARD = [];
+
+  // ── HELPERS ─────────────────────────────────────────────────────────────────
+  function authHeaders() {
+    return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${TOKEN}` };
+  }
+
+  async function apiFetch(url, options = {}) {
+    const resp = await fetch(url, { ...options, headers: { ...authHeaders(), ...(options.headers || {}) } });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ error: resp.statusText }));
+      throw new Error(err.error || resp.statusText);
+    }
+    return resp.json();
+  }
+
+  function fmtMoney(n) {
+    if (n == null) return '-';
+    return '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function fmtDate(d) {
+    if (!d) return '-';
+    return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function esc(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function statusBadge(s) {
+    const map = { active: 'green', inactive: 'gray', suspended: 'red', probation: 'yellow', training: 'blue' };
+    return `<span class="badge badge-${map[s] || 'gray'}">${esc(s)}</span>`;
+  }
+
+  function tierBadge(t) {
+    const map = { bronze: 'yellow', silver: 'gray', gold: 'blue', platinum: 'purple' };
+    const label = t != null ? `${t}%` : '-';
+    return `<span class="badge badge-${map[String(t)] || 'gray'}">${label}</span>`;
+  }
+
+  function commStatusBadge(s) {
+    const map = { pending: 'gray', vesting: 'yellow', earned: 'green', paid: 'blue', clawed_back: 'red' };
+    return `<span class="badge badge-${map[s] || 'gray'}">${esc(s || '-')}</span>`;
+  }
+
+  function showAlert(id, msg, type = 'success') {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = `alert alert-${type} show`;
+    el.textContent = msg;
+    setTimeout(() => { el.classList.remove('show'); }, 4000);
+  }
+
+  // ── TABS ────────────────────────────────────────────────────────────────────
+  function switchTab(name) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === `tab-${name}`));
+    if (name === 'team') loadTeam();
+    if (name === 'leaderboard') loadLeaderboard();
+    if (name === 'overrides') loadOverrides();
+  }
+
+  window.switchTab = switchTab;
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+
+  // ── LOGIN ───────────────────────────────────────────────────────────────────
+  document.getElementById('login-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = document.getElementById('login-btn');
+    const err = document.getElementById('login-error');
+    btn.disabled = true; btn.textContent = 'Signing in...';
+    err.classList.remove('show');
+    try {
+      const data = await fetch(API.login, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: document.getElementById('login-email').value,
+          password: document.getElementById('login-password').value,
+          role: 'manager',
+        }),
+      }).then(r => r.json());
+      if (!data.token) throw new Error(data.error || 'Login failed');
+      TOKEN = data.token;
+      localStorage.setItem('mgr_token', TOKEN);
+      startApp(data.user);
+    } catch (ex) {
+      err.textContent = ex.message;
+      err.classList.add('show');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Sign In';
+    }
+  });
+
+  // ── LOGOUT ──────────────────────────────────────────────────────────────────
+  document.getElementById('logout-btn').addEventListener('click', async () => {
+    await fetch(API.logout, { method: 'POST', headers: authHeaders() }).catch(() => {});
+    TOKEN = null;
+    localStorage.removeItem('mgr_token');
+    document.getElementById('app-shell').classList.remove('active');
+    document.getElementById('login-screen').style.display = 'flex';
+    switchTab('dashboard');
+  });
+
+  // ── START APP ───────────────────────────────────────────────────────────────
+  function startApp(user) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-shell').classList.add('active');
+    if (user) document.getElementById('manager-name-display').textContent = user.name || user.email || '';
+    loadDashboard();
+  }
+
+  async function checkSession() {
+    if (!TOKEN) return;
+    try {
+      const data = await apiFetch(API.session);
+      if (data.user) startApp(data.user);
+    } catch {
+      TOKEN = null;
+      localStorage.removeItem('mgr_token');
+    }
+  }
+
+  // ── DASHBOARD ───────────────────────────────────────────────────────────────
+  async function loadDashboard() {
+    document.getElementById('dash-loading').style.display = 'block';
+    document.getElementById('dash-body').style.display = 'none';
+    try {
+      const data = await apiFetch(API.dashboard);
+      renderDashboard(data);
+    } catch (ex) {
+      document.getElementById('dash-loading').innerHTML = `<div style="color:#ff6b7a">Failed to load: ${esc(ex.message)}</div>`;
+    }
+  }
+
+  function renderDashboard(data) {
+    document.getElementById('dash-loading').style.display = 'none';
+    document.getElementById('dash-body').style.display = 'block';
+
+    const stats = data.stats || {};
+
+    // Stat cards
+    document.getElementById('stats-grid').innerHTML = `
+      <div class="stat-card">
+        <div class="label">Active Reps</div>
+        <div class="value">${stats.active_reps ?? '-'}</div>
+        <div class="sub">${stats.total_reps ?? '-'} total on team</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Team MRR</div>
+        <div class="value">${fmtMoney(stats.team_mrr)}</div>
+        <div class="sub">all active clients</div>
+      </div>
+      <div class="stat-card accent">
+        <div class="label">My Override Earnings</div>
+        <div class="value">${fmtMoney(stats.override_earnings_mtd)}</div>
+        <div class="sub">month to date</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Conversions This Month</div>
+        <div class="value">${stats.conversions_mtd ?? '-'}</div>
+        <div class="sub">new paying clients</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Calls Made Today</div>
+        <div class="value">${stats.calls_today ?? '-'}</div>
+        <div class="sub">across all reps</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Avg. Client MRR</div>
+        <div class="value">${fmtMoney(stats.avg_client_mrr)}</div>
+        <div class="sub">per subscription</div>
+      </div>
+    `;
+
+    // Recent wins
+    const wins = data.recent_wins || [];
+    const winsList = document.getElementById('wins-list');
+    winsList.innerHTML = wins.length
+      ? wins.slice(0, 6).map(w => `
+          <div class="win-item">
+            <h4>${esc(w.rep_name)} - ${esc(w.client_name)}</h4>
+            <p>${esc(w.plan || '')} ${w.mrr ? '&bull; ' + fmtMoney(w.mrr) + '/mo' : ''} &bull; ${fmtDate(w.converted_at)}</p>
+          </div>
+        `).join('')
+      : '<div class="empty-state" style="padding:1rem">No wins recorded yet this period.</div>';
+
+    // Mini leaderboard (top 5)
+    const board = data.leaderboard || [];
+    LEADERBOARD = board;
+    const maxMrr = board.reduce((m, r) => Math.max(m, r.mrr || 0), 0) || 1;
+    document.getElementById('dash-leaderboard').innerHTML = board.slice(0, 5).map((rep, i) => {
+      const rankClass = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : '';
+      const pct = Math.round(((rep.mrr || 0) / maxMrr) * 100);
+      return `
+        <div class="lb-item">
+          <div class="lb-rank ${rankClass}">#${i + 1}</div>
+          <div class="lb-info">
+            <h3>${esc(rep.name)}</h3>
+            <p>${rep.active_clients ?? 0} clients &bull; Tier ${rep.commission_tier ?? '-'}%</p>
+          </div>
+          <div class="lb-mrr">${fmtMoney(rep.mrr)}</div>
+          <div class="lb-bar-wrap"><div class="lb-bar" style="width:${pct}%"></div></div>
+        </div>
+      `;
+    }).join('') || '<div class="empty-state" style="padding:1rem">No data available.</div>';
+  }
+
+  // ── TEAM ────────────────────────────────────────────────────────────────────
+  async function loadTeam() {
+    document.getElementById('team-loading').style.display = 'block';
+    document.getElementById('team-table-wrap').style.display = 'none';
+    document.getElementById('team-empty').style.display = 'none';
+
+    try {
+      // Use the manager dashboard which includes team data,
+      // or call admin-managers endpoint if available
+      const data = await apiFetch(API.dashboard);
+      TEAM_REPS = data.reps || data.team || [];
+      renderTeam(TEAM_REPS);
+    } catch (ex) {
+      document.getElementById('team-loading').innerHTML = `<div style="color:#ff6b7a">Failed: ${esc(ex.message)}</div>`;
+    }
+  }
+
+  function renderTeam(reps) {
+    document.getElementById('team-loading').style.display = 'none';
+    const countEl = document.getElementById('team-rep-count');
+    countEl.textContent = `${reps.length} rep${reps.length !== 1 ? 's' : ''}`;
+
+    if (!reps.length) {
+      document.getElementById('team-empty').style.display = 'block';
+      return;
+    }
+
+    document.getElementById('team-table-wrap').style.display = 'block';
+    document.getElementById('team-tbody').innerHTML = reps.map(rep => `
+      <tr id="rep-row-${esc(rep.rep_id)}">
+        <td>
+          <div style="font-weight:600">${esc(rep.name)}</div>
+          <div style="font-size:0.78rem;color:var(--text-muted)">${esc(rep.email || '')}</div>
+        </td>
+        <td>
+          <select class="inline-select" onchange="updateRep('${esc(rep.rep_id)}', 'status', this.value, this)">
+            <option value="active" ${rep.status === 'active' ? 'selected' : ''}>Active</option>
+            <option value="training" ${rep.status === 'training' ? 'selected' : ''}>Training</option>
+            <option value="probation" ${rep.status === 'probation' ? 'selected' : ''}>Probation</option>
+            <option value="inactive" ${rep.status === 'inactive' ? 'selected' : ''}>Inactive</option>
+            <option value="suspended" ${rep.status === 'suspended' ? 'selected' : ''}>Suspended</option>
+          </select>
+        </td>
+        <td>
+          <select class="inline-select" onchange="updateRep('${esc(rep.rep_id)}', 'commission_tier', this.value, this)">
+            <option value="30" ${rep.commission_tier == 30 ? 'selected' : ''}>30%</option>
+            <option value="35" ${rep.commission_tier == 35 ? 'selected' : ''}>35%</option>
+            <option value="40" ${rep.commission_tier == 40 ? 'selected' : ''}>40%</option>
+            <option value="45" ${rep.commission_tier == 45 ? 'selected' : ''}>45%</option>
+            <option value="50" ${rep.commission_tier == 50 ? 'selected' : ''}>50%</option>
+          </select>
+        </td>
+        <td>${rep.active_clients ?? '-'}</td>
+        <td style="font-weight:600">${fmtMoney(rep.mrr)}</td>
+        <td style="color:#4ade80">${fmtMoney(rep.commission_est)}</td>
+        <td>
+          <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+            <button class="btn btn-sm btn-secondary" onclick="promoteRep('${esc(rep.rep_id)}')">Promote</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  window.updateRep = async function(repId, field, value, selectEl) {
+    const originalVal = selectEl ? selectEl.defaultValue : null;
+    try {
+      const payload = { rep_id: repId };
+      payload[field] = field === 'commission_tier' ? Number(value) : value;
+      await apiFetch(API.repUpdate, { method: 'PATCH', body: JSON.stringify(payload) });
+      if (selectEl) selectEl.defaultValue = value;
+      showAlert('team-alert', 'Rep updated successfully.');
+    } catch (ex) {
+      if (selectEl && originalVal !== null) selectEl.value = originalVal;
+      showAlert('team-alert', 'Update failed: ' + ex.message, 'error');
+    }
+  };
+
+  window.promoteRep = async function(repId) {
+    const rep = TEAM_REPS.find(r => r.rep_id === repId);
+    if (!rep) return;
+    const tiers = [30, 35, 40, 45, 50];
+    const current = Number(rep.commission_tier) || 30;
+    const idx = tiers.indexOf(current);
+    const next = tiers[Math.min(idx + 1, tiers.length - 1)];
+    if (next === current) { showAlert('team-alert', 'Rep is already at the highest tier.', 'error'); return; }
+    try {
+      await apiFetch(API.repUpdate, {
+        method: 'PATCH',
+        body: JSON.stringify({ rep_id: repId, commission_tier: next }),
+      });
+      rep.commission_tier = next;
+      renderTeam(TEAM_REPS);
+      showAlert('team-alert', `${rep.name} promoted to ${next}% tier.`);
+    } catch (ex) {
+      showAlert('team-alert', 'Promotion failed: ' + ex.message, 'error');
+    }
+  };
+
+  // ── LEADERBOARD ──────────────────────────────────────────────────────────────
+  async function loadLeaderboard() {
+    document.getElementById('lb-loading').style.display = 'block';
+    document.getElementById('leaderboard-list').innerHTML = '';
+    document.getElementById('lb-empty').style.display = 'none';
+    try {
+      const data = await apiFetch(API.dashboard);
+      const board = data.leaderboard || [];
+      renderLeaderboard(board);
+    } catch (ex) {
+      document.getElementById('lb-loading').innerHTML = `<div style="color:#ff6b7a">Failed: ${esc(ex.message)}</div>`;
+    }
+  }
+
+  function renderLeaderboard(board) {
+    document.getElementById('lb-loading').style.display = 'none';
+    const list = document.getElementById('leaderboard-list');
+    if (!board.length) {
+      document.getElementById('lb-empty').style.display = 'block';
+      return;
+    }
+    const maxMrr = board.reduce((m, r) => Math.max(m, r.mrr || 0), 0) || 1;
+    list.innerHTML = board.map((rep, i) => {
+      const rankClass = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : '';
+      const pct = Math.round(((rep.mrr || 0) / maxMrr) * 100);
+      const medals = ['🥇', '🥈', '🥉'];
+      return `
+        <div class="lb-item">
+          <div class="lb-rank ${rankClass}">${medals[i] || '#' + (i + 1)}</div>
+          <div class="lb-info">
+            <h3>${esc(rep.name)}</h3>
+            <p>
+              ${rep.active_clients ?? 0} clients
+              &bull; Tier ${rep.commission_tier ?? '-'}%
+              &bull; ${rep.calls_this_month ?? 0} calls/mo
+            </p>
+          </div>
+          <div style="text-align:right; flex-shrink:0">
+            <div class="lb-mrr">${fmtMoney(rep.mrr)}</div>
+            <div style="font-size:0.78rem;color:var(--text-muted)">MRR</div>
+          </div>
+          <div class="lb-bar-wrap">
+            <div class="lb-bar" style="width:${pct}%"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ── OVERRIDES ────────────────────────────────────────────────────────────────
+  async function loadOverrides() {
+    document.getElementById('override-loading').style.display = 'block';
+    document.getElementById('override-body').style.display = 'none';
+    try {
+      const data = await apiFetch(API.dashboard);
+      renderOverrides(data);
+    } catch (ex) {
+      document.getElementById('override-loading').innerHTML = `<div style="color:#ff6b7a">Failed: ${esc(ex.message)}</div>`;
+    }
+  }
+
+  function renderOverrides(data) {
+    document.getElementById('override-loading').style.display = 'none';
+    document.getElementById('override-body').style.display = 'block';
+
+    const summary = data.override_summary || {};
+    document.getElementById('override-summary').innerHTML = `
+      <div class="stat-card accent">
+        <div class="label">MTD Override</div>
+        <div class="value" style="font-size:1.4rem">${fmtMoney(summary.mtd)}</div>
+        <div class="sub">this month</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">YTD Override</div>
+        <div class="value" style="font-size:1.4rem">${fmtMoney(summary.ytd)}</div>
+        <div class="sub">year to date</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Paid Out</div>
+        <div class="value" style="font-size:1.4rem">${fmtMoney(summary.paid)}</div>
+        <div class="sub">lifetime</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Pending</div>
+        <div class="value" style="font-size:1.4rem">${fmtMoney(summary.pending)}</div>
+        <div class="sub">not yet paid</div>
+      </div>
+    `;
+
+    const rows = data.override_history || [];
+    document.getElementById('override-tbody').innerHTML = rows.length
+      ? rows.map(r => `
+          <tr>
+            <td>${esc(r.rep_name || '-')}</td>
+            <td>${esc(r.client_name || '-')}</td>
+            <td><span style="font-size:0.8rem;color:var(--text-muted)">${esc(r.plan || '-')}</span></td>
+            <td>${fmtMoney(r.rep_commission)}</td>
+            <td>${r.override_pct != null ? r.override_pct + '%' : '-'}</td>
+            <td style="font-weight:600;color:#fbbf24">${fmtMoney(r.override_amount)}</td>
+            <td style="font-size:0.82rem;color:var(--text-muted)">${fmtDate(r.period_date)}</td>
+            <td>${commStatusBadge(r.status)}</td>
+          </tr>
+        `).join('')
+      : '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:2rem">No override records yet.</td></tr>';
+  }
+
+  // ── INIT ────────────────────────────────────────────────────────────────────
+  checkSession();
+})();
+</script>
+</body>
+</html>
